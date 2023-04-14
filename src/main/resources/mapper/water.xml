@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jbt.water.WaterMapper">
+    <insert id="insertWaterLevel" parameterType="java.util.List">
+        INSERT INTO water_level (
+            STATION_NAME,
+            YMD,
+            LEVEL,
+            LAT,
+            LON,
+            PROVINCE,
+            COUNTRY,
+            AGENCY,
+            RIVER
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+        (
+            #{item.stationName},
+            #{item.ymd},
+            #{item.level},
+            #{item.lat},
+            #{item.lon},
+            #{item.province},
+            #{item.country},
+            #{item.agency},
+            #{item.river}
+        )
+        </foreach>
+    </insert>
+</mapper>

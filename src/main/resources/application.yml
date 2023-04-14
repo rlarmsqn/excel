@@ -1,0 +1,16 @@
+
+spring:
+  main:
+    banner-mode: 'off'
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: 1234
+
+mybatis:
+  mapper-locations: /mapper/**/*.xml
+  configuration:
+    call-setters-on-nulls: true
+    map-underscore-to-camel-case: true
+
