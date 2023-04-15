@@ -17,7 +17,8 @@ public class WaterApplication {
 		WaterService service = context.getBean(WaterService.class);
 		log.info("insertWaterLevel start");
 //		service.insertWaterLevelByPakkangoung();
-		service.insertWaterLevelByPhiengluang();
+//		service.insertWaterLevelByPhiengluang();
+		service.insertWaterLevelByVernkham();
 	}
 
 }
