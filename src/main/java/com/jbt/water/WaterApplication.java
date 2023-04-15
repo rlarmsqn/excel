@@ -16,8 +16,8 @@ public class WaterApplication {
 		ApplicationContext context = SpringApplication.run(WaterApplication.class, args);
 		WaterService service = context.getBean(WaterService.class);
 		log.info("insertWaterLevel start");
-		service.insertWaterLevelByPakkangoung();
-//		service.test();
+//		service.insertWaterLevelByPakkangoung();
+		service.insertWaterLevelByPhiengluang();
 	}
 
 }

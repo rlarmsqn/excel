@@ -16,8 +16,8 @@ import java.util.Set;
 
 public class ReadExcel {
     public List<WaterVO> read() throws IOException {
-        String filePath = "\\\\nas\\4_프로젝트\\프로젝트-2023\\3_수행\\X23004P_라오스 남능강\\998_공유폴더\\입수 정리 폴더\\20230410_수위 관측자료 (2022년 포함)\\Hydromet Data\\";
-        String fileName = "Pakkangoung_waterlevel.xlsx";
+        String filePath = "C:\\Users\\W\\Desktop";
+        String fileName = "Phiengluang.xlsx";
 
         FileInputStream file = new FileInputStream(new File(filePath, fileName));
 

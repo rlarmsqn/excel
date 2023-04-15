@@ -16,6 +16,8 @@ public class ExcelRead {
     public static List<Map<String, String>> read(ExcelReadOption excelReadOption, XSSFWorkbook workbook, int sheetNum) {
         XSSFSheet sheet = workbook.getSheetAt(sheetNum);
         int numOfRows = sheet.getLastRowNum();
+//        int numOfRows = sheet.getPhysicalNumberOfRows();
+
         int numOfCells = 0;
 
         Row row = null;
@@ -47,6 +49,7 @@ public class ExcelRead {
                 result.add(map);
             }
         }
+
         return result;
     }
 }
