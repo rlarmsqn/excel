@@ -13,4 +13,6 @@ public class WaterVO {
     private String country;
     private String agency;
     private String river;
+    private String altitude;
+    private String catchmentArea;
 }

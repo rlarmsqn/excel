@@ -1,5 +1,7 @@
 package com.jbt.water.util;
 
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -45,6 +47,86 @@ public class ExcelRead {
                     }
 
                     map.put(cellName, ExcelCellRef.getValue(cell));
+                }
+                result.add(map);
+            }
+        }
+
+        return result;
+    }
+
+    public static List<Map<String, String>> read2(ExcelReadOption excelReadOption, HSSFWorkbook workbook, int sheetNum) {
+        HSSFSheet sheet = workbook.getSheetAt(sheetNum);
+        int numOfRows = sheet.getLastRowNum();
+//        int numOfRows = sheet.getPhysicalNumberOfRows();
+
+        int numOfCells = 0;
+
+        Row row = null;
+        Cell cell = null;
+
+        String cellName = "";
+        Map<String, String> map = null;
+
+        List<Map<String, String>> result = new ArrayList<>();
+        for(int rowIndex = excelReadOption.getStartRow() -1; rowIndex <= numOfRows; rowIndex++) {
+            row = sheet.getRow(rowIndex);
+
+            if(row != null) {
+                numOfCells = row.getLastCellNum();
+
+                map = new HashMap<>();
+
+                for(int cellIndex = 0; cellIndex < numOfCells; cellIndex++) {
+                    cell = row.getCell(cellIndex);
+
+                    cellName = ExcelCellRef.getName(cell, cellIndex);
+
+                    if(!excelReadOption.getOutputColumns().contains(cellName)) {
+                        continue;
+                    }
+
+                    map.put(cellName, ExcelCellRef.getValue(cell));
+                }
+                result.add(map);
+            }
+        }
+
+        return result;
+    }
+
+    public static List<Map<String, String>> onlyDoubleRead(ExcelReadOption excelReadOption, HSSFWorkbook workbook, int sheetNum) {
+        HSSFSheet sheet = workbook.getSheetAt(sheetNum);
+        int numOfRows = sheet.getLastRowNum();
+//        int numOfRows = sheet.getPhysicalNumberOfRows();
+
+        int numOfCells = 0;
+
+        Row row = null;
+        Cell cell = null;
+
+        String cellName = "";
+        Map<String, String> map = null;
+
+        List<Map<String, String>> result = new ArrayList<>();
+        for(int rowIndex = excelReadOption.getStartRow() -1; rowIndex <= numOfRows; rowIndex++) {
+            row = sheet.getRow(rowIndex);
+
+            if(row != null) {
+                numOfCells = row.getLastCellNum();
+
+                map = new HashMap<>();
+
+                for(int cellIndex = 0; cellIndex < numOfCells; cellIndex++) {
+                    cell = row.getCell(cellIndex);
+
+                    cellName = ExcelCellRef.getName(cell, cellIndex);
+
+                    if(!excelReadOption.getOutputColumns().contains(cellName)) {
+                        continue;
+                    }
+
+                    map.put(cellName, ExcelCellRef.getDoubleValue(cell));
                 }
                 result.add(map);
             }

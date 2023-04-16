@@ -13,10 +13,9 @@ public class ExcelCellRef {
 
     public static String getName(Cell cell, int cellIndex) {
         int cellNum = 0;
-        if(cell != null) {
+        if (cell != null) {
             cellNum = cell.getColumnIndex();
-        }
-        else {
+        } else {
             cellNum = cellIndex;
         }
 
@@ -26,25 +25,38 @@ public class ExcelCellRef {
     public static String getValue(Cell cell) {
         String value = "";
 
-        if(cell == null) {
+        if (cell == null) {
             value = "";
-        }
-        else {
-            if(cell.getCellType() == CellType.FORMULA) {
+        } else {
+            if (cell.getCellType() == CellType.FORMULA) {
                 value = cell.getCellFormula();
-            } else if(cell.getCellType() == CellType.NUMERIC) {
+            } else if (cell.getCellType() == CellType.NUMERIC) {
 //                value =  cell.getNumericCellValue() + "";
                 value = String.format("%.2f", cell.getNumericCellValue());
-            } else if(cell.getCellType() == CellType.STRING) {
+            } else if (cell.getCellType() == CellType.STRING) {
                 value = cell.getStringCellValue();
-            } else if(cell.getCellType() == CellType.BOOLEAN) {
+            } else if (cell.getCellType() == CellType.BOOLEAN) {
                 value = cell.getBooleanCellValue() + "";
-            } else if(cell.getCellType() == CellType.ERROR) {
+            } else if (cell.getCellType() == CellType.ERROR) {
                 value = cell.getErrorCellValue() + "";
-            } else if(cell.getCellType() == CellType.BLANK) {
+            } else if (cell.getCellType() == CellType.BLANK) {
                 value = "";
             } else {
                 value = cell.getStringCellValue();
+            }
+        }
+        return value;
+    }
+
+    public static String getDoubleValue(Cell cell) {
+        String value = "";
+
+        if (cell == null) {
+            value = "";
+        } else {
+            if (cell.getCellType() == CellType.NUMERIC) {
+//                value =  cell.getNumericCellValue() + "";
+                value = String.format("%.2f", cell.getNumericCellValue());
             }
         }
         return value;

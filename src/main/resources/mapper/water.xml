@@ -11,7 +11,9 @@
             PROVINCE,
             COUNTRY,
             AGENCY,
-            RIVER
+            RIVER,
+            ALTITUDE,
+            CATCHMENT_AREA
         ) VALUES
         <foreach collection="list" item="item" separator=",">
         (
@@ -23,7 +25,9 @@
             #{item.province},
             #{item.country},
             #{item.agency},
-            #{item.river}
+            #{item.river},
+            #{item.altitude},
+            #{item.catchmentArea}
         )
         </foreach>
     </insert>
