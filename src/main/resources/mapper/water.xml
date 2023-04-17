@@ -5,30 +5,42 @@
         INSERT INTO water_level (
             STATION_NAME,
             YMD,
-            LEVEL,
-            LAT,
-            LON,
-            PROVINCE,
-            COUNTRY,
-            AGENCY,
-            RIVER,
-            ALTITUDE,
-            CATCHMENT_AREA
+            LEVEL
         ) VALUES
         <foreach collection="list" item="item" separator=",">
         (
             #{item.stationName},
             #{item.ymd},
-            #{item.level},
-            #{item.lat},
-            #{item.lon},
-            #{item.province},
-            #{item.country},
-            #{item.agency},
-            #{item.river},
-            #{item.altitude},
-            #{item.catchmentArea}
+            #{item.level}
         )
         </foreach>
     </insert>
+
+    <insert id="insertWaterInfo" parameterType="com.jbt.water.vo.WaterInfoVO">
+        INSERT INTO water_level_info (
+            STATION_NAME,
+            LAT,
+            LON,
+            RIVER,
+            ALTITUDE,
+            CATCHMENT_AREA,
+            PROVINCE,
+            COUNTRY,
+            AGENCY
+        ) VALUES (
+            #{stationName},
+            #{lat},
+            #{lon},
+            #{river},
+            #{altitude},
+            #{catchmentArea},
+            #{province},
+            #{country},
+            #{agency}
+        )
+    </insert>
+
+    <select id="stationNameCheck" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT COUNT(STATION_NAME) FROM WATER_LEVEL_INFO WHERE STATION_NAME = #{value}
+    </select>
 </mapper>

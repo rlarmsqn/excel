@@ -9,6 +9,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import javax.xml.bind.SchemaOutputResolver;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -98,7 +99,45 @@ public class ExcelRead {
     public static List<Map<String, String>> onlyDoubleRead(ExcelReadOption excelReadOption, HSSFWorkbook workbook, int sheetNum) {
         HSSFSheet sheet = workbook.getSheetAt(sheetNum);
         int numOfRows = sheet.getLastRowNum();
-//        int numOfRows = sheet.getPhysicalNumberOfRows();
+
+        int numOfCells = 0;
+
+        Row row = null;
+        Cell cell = null;
+
+        String cellName = "";
+        Map<String, String> map = null;
+
+        List<Map<String, String>> result = new ArrayList<>();
+        for(int rowIndex = excelReadOption.getStartRow() -1; rowIndex <= numOfRows; rowIndex++) {
+            row = sheet.getRow(rowIndex);
+
+            if(row != null) {
+                numOfCells = row.getLastCellNum();
+
+                map = new HashMap<>();
+
+                for(int cellIndex = 0; cellIndex < numOfCells; cellIndex++) {
+                    cell = row.getCell(cellIndex);
+
+                    cellName = ExcelCellRef.getName(cell, cellIndex);
+
+                    if(!excelReadOption.getOutputColumns().contains(cellName)) {
+                        continue;
+                    }
+
+                    map.put(cellName, ExcelCellRef.getDoubleValue(cell));
+                }
+                result.add(map);
+            }
+        }
+
+        return result;
+    }
+
+    public static List<Map<String, String>> onlyDoubleReadByXSSF(ExcelReadOption excelReadOption, XSSFWorkbook workbook, int sheetNum) {
+        XSSFSheet sheet = workbook.getSheetAt(sheetNum);
+        int numOfRows = sheet.getLastRowNum();
 
         int numOfCells = 0;
 
