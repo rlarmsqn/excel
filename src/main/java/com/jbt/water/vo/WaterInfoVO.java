@@ -7,8 +7,8 @@ import lombok.Data;
 @AllArgsConstructor
 public class WaterInfoVO {
    private String stationName;
-   private String lat;
-   private String lon;
+   private Double lat;
+   private Double lon;
    private String river;
    private String altitude;
    private String catchmentArea;

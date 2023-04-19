@@ -3,6 +3,7 @@ package com.jbt.water;
 import com.jbt.water.vo.WaterVO;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFMap;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -14,8 +15,13 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ReadExcel {
-    public List<WaterVO> read() throws IOException {
-        String filePath = "C:\\Users\\W\\Desktop";
+
+    public static void main(String[] args) throws IOException {
+        ReadExcel readExcel = new ReadExcel();
+        readExcel.read();
+    }
+    public void read() throws IOException {
+        String filePath = "C:\\Users\\srmsq\\Desktop";
         String fileName = "Phiengluang.xlsx";
 
         FileInputStream file = new FileInputStream(new File(filePath, fileName));
@@ -24,7 +30,8 @@ public class ReadExcel {
         XSSFWorkbook workbook = new XSSFWorkbook(file);
 
         // workbook의 첫번째 sheet를 가저온다.
-        XSSFSheet sheet = workbook.getSheetAt(0);
+        XSSFSheet sheet = workbook.getSheetAt(1);
+        System.out.println(sheet.getTopRow());
 
         // 만약 특정 이름의 시트를 찾는다면 workbook.getSheet("찾는 시트의 이름");
         // 만약 모든 시트를 순회하고 싶으면
@@ -32,9 +39,9 @@ public class ReadExcel {
         //      XSSFSheet sheet = workbook.getSheetAt(i);
         // }
 
+
         List<WaterVO> list = new ArrayList<>();
         String year = "";
-
 
 
         // 모든 행(row)들을 조회한다.
@@ -83,7 +90,5 @@ public class ReadExcel {
             }
             System.out.println();
         }
-
-        return list;
     }
 }

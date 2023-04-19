@@ -9,15 +9,14 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import javax.xml.bind.SchemaOutputResolver;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ExcelRead {
-    public static List<Map<String, String>> read(ExcelReadOption excelReadOption, XSSFWorkbook workbook, int sheetNum) {
-        XSSFSheet sheet = workbook.getSheetAt(sheetNum);
+    public static List<Map<String, String>> read(ExcelReadOption excelReadOption, Workbook workbook, int sheetNum) {
+        Sheet sheet = workbook.getSheetAt(sheetNum);
         int numOfRows = sheet.getLastRowNum();
 //        int numOfRows = sheet.getPhysicalNumberOfRows();
 
@@ -56,7 +55,7 @@ public class ExcelRead {
         return result;
     }
 
-    public static List<Map<String, String>> read2(ExcelReadOption excelReadOption, HSSFWorkbook workbook, int sheetNum) {
+    public static List<Map<String, String>> readHSSF(ExcelReadOption excelReadOption, HSSFWorkbook workbook, int sheetNum) {
         HSSFSheet sheet = workbook.getSheetAt(sheetNum);
         int numOfRows = sheet.getLastRowNum();
 //        int numOfRows = sheet.getPhysicalNumberOfRows();
