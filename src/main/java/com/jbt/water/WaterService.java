@@ -119,7 +119,7 @@ public class WaterService {
         GregorianCalendar gc = new GregorianCalendar(); // 윤년계산
 
         // null값 로그
-        for(int i = 0; i < list.size(); i++) {
+        for (int i = 0; i < list.size(); i++) {
             if (list.get(i).get("A").equals("Date") || list.get(i).get("A").equals("Data") || list.get(i).get("A").equals("Days")) {
                 for (int j = i + 1; j < i + 32; j++) {
                     if (list.get(j).get("A").split("\\.")[0].length() < 2) {
@@ -142,7 +142,7 @@ public class WaterService {
             }
         }
 
-        if(logTxt.length() == 0) {
+        if (logTxt.length() == 0) {
             for (int i = 0; i < list.size(); i++) {
                 // A에 Date or Data 나오고난후
                 if (list.get(i).get("A").equals("Date") || list.get(i).get("A").equals("Data") || list.get(i).get("A").equals("Days")) {
@@ -250,65 +250,145 @@ public class WaterService {
 
     public StringBuilder nullCheck(String B, String C, String D, String E, String F, String G,
                                    String H, String I, String J, String K, String L, String M, String year, String date) {
+
         StringBuilder log = new StringBuilder();
         GregorianCalendar gc = new GregorianCalendar();
 
         if (B == null || B.equals("")) {
             log.append(year + "-01-" + date + " 수위값이 없습니다.");
+        } else {
+            try {
+                Double.parseDouble(B);
+            } catch (NumberFormatException e) {
+                log.append(year + "-01-" + date + " 수위값이 문자열입니다.");
+            }
         }
 
         if (gc.isLeapYear(Integer.parseInt(year))) {
             if (!date.equals("30") && !date.equals("31")) {
                 if (C == null || C.equals("")) {
                     log.append(year + "-02-" + date + " 수위값이 없습니다.");
+                } else {
+                    try {
+                        Double.parseDouble(C);
+                    } catch (NumberFormatException e) {
+                        log.append(year + "-02-" + date + " 수위값이 문자열입니다.");
+                    }
                 }
             }
         } else {
             if (!date.equals("29") && !date.equals("30") && !date.equals("31")) {
                 if (C == null || C.equals("")) {
                     log.append(year + "-02-" + date + " 수위값이 없습니다.");
+                } else {
+                    try {
+                        Double.parseDouble(C);
+                    } catch (NumberFormatException e) {
+                        log.append(year + "-02-" + date + " 수위값이 문자열입니다.");
+                    }
+                }
+            }
+        }
+
+
+        if (!date.equals("31")) {
+            if (E == null || E.equals("")) {
+                log.append(year + "-04-" + date + " 수위값이 없습니다.");
+            } else {
+                try {
+                    Double.parseDouble(E);
+                } catch (NumberFormatException e) {
+                    log.append(year + "-04-" + date + " 수위값이 문자열입니다.");
+                }
+            }
+            if (G == null || G.equals("")) {
+                log.append(year + "-06-" + date + " 수위값이 없습니다.");
+            } else {
+                try {
+                    Double.parseDouble(G);
+                } catch (NumberFormatException e) {
+                    log.append(year + "-06-" + date + " 수위값이 문자열입니다.");
+                }
+            }
+            if (J == null || J.equals("")) {
+                log.append(year + "-09-" + date + " 수위값이 없습니다.");
+            } else {
+                try {
+                    Double.parseDouble(J);
+                } catch (NumberFormatException e) {
+                    log.append(year + "-09-" + date + " 수위값이 문자열입니다.");
+                }
+            }
+            if (L == null || L.equals("")) {
+                log.append(year + "-11-" + date + " 수위값이 없습니다.");
+            } else {
+                try {
+                    Double.parseDouble(L);
+                } catch (NumberFormatException e) {
+                    log.append(year + "-11-" + date + " 수위값이 문자열입니다.");
                 }
             }
         }
 
         if (D == null || D.equals("")) {
             log.append(year + "-03-" + date + " 수위값이 없습니다.");
-        }
-
-        if (!date.equals("31")) {
-            if (E == null || E.equals("")) {
-                log.append(year + "-04-" + date + " 수위값이 없습니다.");
-            }
-            if (G == null || G.equals("")) {
-                log.append(year + "-06-" + date + " 수위값이 없습니다.");
-            }
-            if (J == null || J.equals("")) {
-                log.append(year + "-09-" + date + " 수위값이 없습니다.");
-            }
-            if (L == null || L.equals("")) {
-                log.append(year + "-11-" + date + " 수위값이 없습니다.");
+        } else {
+            try {
+                Double.parseDouble(D);
+            } catch (NumberFormatException e) {
+                log.append(year + "-03-" + date + " 수위값이 문자열입니다.");
             }
         }
 
         if (F == null || F.equals("")) {
             log.append(year + "-05-" + date + " 수위값이 없습니다.");
+        } else {
+            try {
+                Double.parseDouble(F);
+            } catch (NumberFormatException e) {
+                log.append(year + "-05-" + date + " 수위값이 문자열입니다.");
+            }
         }
 
         if (H == null || H.equals("")) {
             log.append(year + "-07-" + date + " 수위값이 없습니다.");
+        } else {
+            try {
+                Double.parseDouble(H);
+            } catch (NumberFormatException e) {
+                log.append(year + "-07-" + date + " 수위값이 문자열입니다.");
+            }
         }
 
         if (I == null || I.equals("")) {
             log.append(year + "-08-" + date + " 수위값이 없습니다.");
+        } else {
+            try {
+                Double.parseDouble(I);
+            } catch (NumberFormatException e) {
+                log.append(year + "-08-" + date + " 수위값이 문자열입니다.");
+            }
         }
 
 
         if (K == null || K.equals("")) {
             log.append(year + "-10-" + date + " 수위값이 없습니다.");
+        } else {
+            try {
+                Double.parseDouble(K);
+            } catch (NumberFormatException e) {
+                log.append(year + "-10-" + date + " 수위값이 문자열입니다.");
+            }
         }
 
         if (M == null || M.equals("")) {
             log.append(year + "-12-" + date + " 수위값이 없습니다.");
+        } else {
+            try {
+                Double.parseDouble(M);
+            } catch (NumberFormatException e) {
+                log.append(year + "-12-" + date + " 수위값이 문자열입니다.");
+            }
         }
 
         return log;
