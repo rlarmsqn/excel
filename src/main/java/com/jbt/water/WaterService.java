@@ -3,6 +3,7 @@ package com.jbt.water;
 import com.jbt.water.util.ExcelFilType;
 import com.jbt.water.util.ExcelRead;
 import com.jbt.water.util.ExcelReadOption;
+import com.jbt.water.vo.RainFallVO;
 import com.jbt.water.vo.WaterInfoVO;
 import com.jbt.water.vo.WaterVO;
 import lombok.RequiredArgsConstructor;
@@ -11,9 +12,8 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Slf4j
@@ -23,7 +23,7 @@ public class WaterService {
 
     private final WaterMapper waterMapper;
 
-    public String test() throws IOException {
+    public String insertData() throws IOException {
         String filePath = "C:\\Users\\srmsq\\Desktop";
         String fileName = "Pakkangoung_waterlevel.xlsx";
 //        String fileName = "Phiengluang.xlsx";
@@ -144,7 +144,6 @@ public class WaterService {
 
         if (logTxt.length() == 0) {
             for (int i = 0; i < list.size(); i++) {
-                // A에 Date or Data 나오고난후
                 if (list.get(i).get("A").equals("Date") || list.get(i).get("A").equals("Data") || list.get(i).get("A").equals("Days")) {
                     for (int j = i + 1; j < i + 32; j++) {
                         List<WaterVO> result = new ArrayList<>();
@@ -951,4 +950,154 @@ public class WaterService {
 
     }
 
+    public void insertFacility() throws IOException {
+
+        String filePath = "C:\\Users\\srmsq\\Desktop\\facility.hyd";
+        File file = new File(filePath);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "euc-kr"));
+
+        List<String> list = new ArrayList<>();
+
+        List<String> idTemp = new ArrayList<>();
+        List<String> nameTemp = new ArrayList<>();
+        List<String> id = new ArrayList<>();
+        List<String> name = new ArrayList<>();
+
+        List<String[]> facility = new ArrayList<>();
+
+        String str;
+        // 파일 한줄씩
+        while ((str = reader.readLine()) != null) {
+            list.add(str);
+            if (str.matches(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*")) {
+                String tempString = str.substring(2).replaceAll("\\s", "").trim();
+                nameTemp = Arrays.asList(tempString.split("[가-힣]"));
+                idTemp = Arrays.asList(tempString.split("[0-9]"));
+            }
+        }
+
+        // id
+        for (int i = 0; i < idTemp.size(); i++) {
+            if (!idTemp.get(i).equals("")) {
+                id.add(idTemp.get(i).trim());
+            }
+        }
+
+        // name
+        for (int i = 0; i < nameTemp.size(); i++) {
+            if (!nameTemp.get(i).equals("")) {
+                name.add(nameTemp.get(i).trim());
+            }
+        }
+
+        // facility info
+        for (int i = 8; i < list.size(); i++) {
+            facility.add(list.get(i).trim().split("\\s"));
+        }
+
+
+        String idStr;
+        String nameStr;
+        for (int i = 0; i < 1; i++) {
+            for (int j = 0; j < facility.get(i).length; j++) {
+                if (!facility.get(i)[j].equals("")) {
+
+                    if((j%6)==0) {
+                        idStr = id.get(j);
+                        nameStr = name.get(j);
+                    }
+
+                    System.out.println(id.get(i) + " " + name.get(i) + " " + facility.get(i)[j]);
+                }
+            }
+        }
+
+    }
+
+    public void insertRainFall() throws IOException {
+        if (waterMapper.countRainFall() != 0) {
+            waterMapper.deleteRainFall();
+        }
+        BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\srmsq\\Desktop\\rainfall.hyd"));
+
+        List<String> list = new ArrayList<>();
+        List<String[]> rainfall = new ArrayList<>();
+        List<RainFallVO> rainFallVOList = new ArrayList<>();
+
+        String str;
+        // 파일 한줄씩
+        while ((str = reader.readLine()) != null) {
+            list.add(str);
+        }
+
+        // 관측소 id
+        String[] id = list.get(0).trim().split("\\s\\s");
+
+        // 강우량
+        for (int i = 1; i < list.size(); i++) {
+            rainfall.add(list.get(i).trim().split("\\s\\s\\s\\s"));
+        }
+
+        for (int i = 0; i < rainfall.size(); i++) {
+            for (int j = 0; j < rainfall.get(i).length; j++) {
+                if (j + 1 < rainfall.get(i).length) {
+//                    System.out.println(id[j] + " " + rainfall.get(i)[0] + " " + rainfall.get(i)[j + 1]);
+                    RainFallVO rainFallVO = new RainFallVO();
+                    rainFallVO.setId(id[j]);
+                    rainFallVO.setYmdHm(rainfall.get(i)[0].replace("@", " "));
+                    rainFallVO.setFall(rainfall.get(i)[j + 1].trim());
+                    rainFallVOList.add(rainFallVO);
+                }
+            }
+            waterMapper.insertRainFall(rainFallVOList);
+            rainFallVOList.clear();
+        }
+    }
+
+    public void generateRainFallFile() {
+        List<RainFallVO> rainFallVOList = waterMapper.selectRainFall();
+        List<String> rainFallId = waterMapper.selectRainFallId();
+        String fileName = "C:\\Users\\srmsq\\Desktop\\rerainfall.hyd";
+        File file = new File(fileName);
+
+        StringBuilder sb = new StringBuilder();
+
+        // 0 부터 rainFallVOList.size()까지 돌리면서 rainFallId.size() 마다 담아
+        try {
+            if (file.exists()) {
+                file.delete();
+            }
+
+            BufferedWriter bw = new BufferedWriter(new FileWriter(fileName, true));
+            bw.write("                   ");
+
+            for (int i = 0; i < rainFallId.size(); i++) {
+                if ((i + 1) == rainFallId.size()) {
+                    bw.write(rainFallId.get(i));
+                } else {
+                    bw.write(rainFallId.get(i) + "  ");
+                }
+            }
+
+            bw.write("\n");
+
+            for (int i = 0; i < rainFallVOList.size(); i++) {
+                sb.append(rainFallVOList.get(i).getFall() + "    ");
+                if (i != 0) {
+                    if ((i % (rainFallId.size() - 1)) == 0) {
+                        sb.delete(sb.length() - 4, sb.length());
+                        sb.insert(0, rainFallVOList.get(i).getYmdHm().replace(" ", "@") + "     ");
+                        sb.append("\n");
+                        bw.write(sb.toString());
+                        sb.setLength(0);
+                    }
+                }
+            }
+            bw.flush();
+
+            bw.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

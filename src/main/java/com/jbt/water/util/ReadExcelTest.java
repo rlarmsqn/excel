@@ -1,9 +1,8 @@
-package com.jbt.water;
+package com.jbt.water.util;
 
 import com.jbt.water.vo.WaterVO;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFMap;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -14,11 +13,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ReadExcel {
+public class ReadExcelTest {
 
     public static void main(String[] args) throws IOException {
-        ReadExcel readExcel = new ReadExcel();
-        readExcel.read();
+        ReadExcelTest readExcelTest = new ReadExcelTest();
+        readExcelTest.read();
     }
     public void read() throws IOException {
         String filePath = "C:\\Users\\srmsq\\Desktop";

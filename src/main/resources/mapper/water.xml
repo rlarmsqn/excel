@@ -43,4 +43,35 @@
     <select id="stationNameCheck" parameterType="java.lang.String" resultType="java.lang.Integer">
         SELECT COUNT(STATION_NAME) FROM WATER_LEVEL_INFO WHERE STATION_NAME = #{value}
     </select>
+
+    <insert id="insertRainFall" parameterType="java.util.List">
+        INSERT INTO rainfall (
+            ID,
+            YMD_HM,
+            FALL
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+        (
+            #{item.id},
+            #{item.ymdHm},
+            #{item.fall}
+        )
+        </foreach>
+    </insert>
+
+    <select id="selectRainFall" resultType="com.jbt.water.vo.RainFallVO">
+        SELECT * FROM rainfall ORDER BY ymd_hm
+    </select>
+
+    <select id="selectRainFallId" resultType="String">
+        SELECT DISTINCT id from rainfall ORDER BY id
+    </select>
+
+    <select id="countRainFall" resultType="Integer">
+        SELECT COUNT(*) FROM rainfall
+    </select>
+
+    <delete id="deleteRainFall">
+        DELETE FROM rainfall
+    </delete>
 </mapper>
