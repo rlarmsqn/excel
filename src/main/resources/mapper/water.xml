@@ -49,14 +49,24 @@
             ID,
             NAME,
             YMD_HM,
-            FALL
+            WATER_LEVEL,
+            INFLOW,
+            TOTAL_DISCHARGE,
+            FALL,
+            LOW_YIELD,
+            RESERVOIR
         ) VALUES
         <foreach collection="list" item="item" separator=",">
         (
             #{item.id},
             #{item.name},
             #{item.ymdHm},
-            #{item.fall}
+            #{item.waterLevel},
+            #{item.inflow},
+            #{item.totalDischarge},
+            #{item.fall},
+            #{item.lowYield},
+            #{item.reservoir}
         )
         </foreach>
     </insert>

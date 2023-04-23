@@ -998,7 +998,7 @@ public class WaterService {
 
         List<RainFallVO> result = new ArrayList<>();
         int index = 0;
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < facility.size(); i++) {
             for (int j = 0; j < facility.get(i).length; j+=6) {
                 if(j+1 < facility.get(i).length) {
                     if (j != 0) {
@@ -1006,19 +1006,24 @@ public class WaterService {
                             index++;
                         }
                     }
-                   System.out.println(j + " " + id.get(index) + " " + " " + name.get(index) + " " + facility.get(i)[0] + " " +
-                                      facility.get(i)[j + 1] + " " + facility.get(i)[j + 2] + " " + facility.get(i)[j + 3] + " " + facility.get(i)[j + 4] + " " + facility.get(i)[j + 5] + " " + facility.get(i)[j + 6]);
-                    /*RainFallVO rainFallVO = new RainFallVO();
-                    rainFallVO.setId(id.get(tempIndex));
-                    rainFallVO.setName(name.get(tempIndex));
+                   /*System.out.println(j + " " + id.get(index) + " " + " " + name.get(index) + " " + facility.get(i)[0] + " " +
+                                      facility.get(i)[j + 1] + " " + facility.get(i)[j + 2] + " " + facility.get(i)[j + 3] + " " + facility.get(i)[j + 4] + " " + facility.get(i)[j + 5] + " " + facility.get(i)[j + 6]);*/
+                    RainFallVO rainFallVO = new RainFallVO();
+                    rainFallVO.setId(id.get(index));
+                    rainFallVO.setName(name.get(index));
                     rainFallVO.setYmdHm(facility.get(i)[0].replace("@"," "));
-                    rainFallVO.setFall(facility.get(i)[j + 1]);
-                    result.add(rainFallVO);*/
+                    rainFallVO.setWaterLevel( facility.get(i)[j + 1]);
+                    rainFallVO.setInflow( facility.get(i)[j + 2]);
+                    rainFallVO.setTotalDischarge( facility.get(i)[j + 3]);
+                    rainFallVO.setFall(facility.get(i)[j + 4]);
+                    rainFallVO.setLowYield( facility.get(i)[j + 5]);
+                    rainFallVO.setReservoir( facility.get(i)[j + 6]);
+                    result.add(rainFallVO);
                 } else {
                     index = 0;
                 }
             }
-//            waterMapper.insertRainFall(result);
+            waterMapper.insertRainFall(result);
             result.clear();
         }
     }
