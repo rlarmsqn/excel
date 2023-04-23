@@ -47,12 +47,14 @@
     <insert id="insertRainFall" parameterType="java.util.List">
         INSERT INTO rainfall (
             ID,
+            NAME,
             YMD_HM,
             FALL
         ) VALUES
         <foreach collection="list" item="item" separator=",">
         (
             #{item.id},
+            #{item.name},
             #{item.ymdHm},
             #{item.fall}
         )

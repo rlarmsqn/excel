@@ -8,6 +8,7 @@ import com.jbt.water.vo.WaterInfoVO;
 import com.jbt.water.vo.WaterVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
@@ -952,7 +953,7 @@ public class WaterService {
 
     public void insertFacility() throws IOException {
 
-        String filePath = "C:\\Users\\srmsq\\Desktop\\facility.hyd";
+        String filePath = "C:\\Users\\W\\Desktop\\facility.hyd";
         File file = new File(filePath);
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "euc-kr"));
 
@@ -971,8 +972,8 @@ public class WaterService {
             list.add(str);
             if (str.matches(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*")) {
                 String tempString = str.substring(2).replaceAll("\\s", "").trim();
-                nameTemp = Arrays.asList(tempString.split("[가-힣]"));
-                idTemp = Arrays.asList(tempString.split("[0-9]"));
+                idTemp = Arrays.asList(tempString.split("[가-힣]"));
+                nameTemp = Arrays.asList(tempString.split("[0-9]"));
             }
         }
 
@@ -992,26 +993,34 @@ public class WaterService {
 
         // facility info
         for (int i = 8; i < list.size(); i++) {
-            facility.add(list.get(i).trim().split("\\s"));
+            facility.add(StringUtils.split(list.get(i)));
         }
 
-
-        String idStr;
-        String nameStr;
+        List<RainFallVO> result = new ArrayList<>();
+        int tempIndex = 0;
         for (int i = 0; i < 1; i++) {
-            for (int j = 0; j < facility.get(i).length; j++) {
-                if (!facility.get(i)[j].equals("")) {
-
-                    if((j%6)==0) {
-                        idStr = id.get(j);
-                        nameStr = name.get(j);
+            for (int j = 0; j < facility.get(i).length; j+=6) {
+                if(j+1 < facility.get(i).length) {
+                    if (j != 0) {
+                        if (j % 6 == 0) {
+                            tempIndex++;
+                        }
                     }
-
-                    System.out.println(id.get(i) + " " + name.get(i) + " " + facility.get(i)[j]);
+                   System.out.println(j + " " + id.get(tempIndex) + " " + " " + name.get(tempIndex) + " " + facility.get(i)[0] + " " +
+                                      facility.get(i)[j + 1] + " " + facility.get(i)[j + 2] + " " + facility.get(i)[j + 3] + " " + facility.get(i)[j + 4] + " " + facility.get(i)[j + 5] + " " + facility.get(i)[j + 6]);
+                    /*RainFallVO rainFallVO = new RainFallVO();
+                    rainFallVO.setId(id.get(tempIndex));
+                    rainFallVO.setName(name.get(tempIndex));
+                    rainFallVO.setYmdHm(facility.get(i)[0].replace("@"," "));
+                    rainFallVO.setFall(facility.get(i)[j + 1]);
+                    result.add(rainFallVO);*/
+                } else {
+                    tempIndex = 0;
                 }
             }
+//            waterMapper.insertRainFall(result);
+            result.clear();
         }
-
     }
 
     public void insertRainFall() throws IOException {
