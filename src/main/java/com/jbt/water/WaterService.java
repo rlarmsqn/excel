@@ -997,16 +997,16 @@ public class WaterService {
         }
 
         List<RainFallVO> result = new ArrayList<>();
-        int tempIndex = 0;
+        int index = 0;
         for (int i = 0; i < 1; i++) {
             for (int j = 0; j < facility.get(i).length; j+=6) {
                 if(j+1 < facility.get(i).length) {
                     if (j != 0) {
                         if (j % 6 == 0) {
-                            tempIndex++;
+                            index++;
                         }
                     }
-                   System.out.println(j + " " + id.get(tempIndex) + " " + " " + name.get(tempIndex) + " " + facility.get(i)[0] + " " +
+                   System.out.println(j + " " + id.get(index) + " " + " " + name.get(index) + " " + facility.get(i)[0] + " " +
                                       facility.get(i)[j + 1] + " " + facility.get(i)[j + 2] + " " + facility.get(i)[j + 3] + " " + facility.get(i)[j + 4] + " " + facility.get(i)[j + 5] + " " + facility.get(i)[j + 6]);
                     /*RainFallVO rainFallVO = new RainFallVO();
                     rainFallVO.setId(id.get(tempIndex));
@@ -1015,7 +1015,7 @@ public class WaterService {
                     rainFallVO.setFall(facility.get(i)[j + 1]);
                     result.add(rainFallVO);*/
                 } else {
-                    tempIndex = 0;
+                    index = 0;
                 }
             }
 //            waterMapper.insertRainFall(result);
