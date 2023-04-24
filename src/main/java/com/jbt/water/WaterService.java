@@ -1150,6 +1150,19 @@ public class WaterService {
                     index += facilityIdName.size();
                 }
 
+                String space1 = null;
+                switch (facilityVOList.get(i).getWaterLevel().length()) {
+                    case 6 :
+                        space1 = "    ";
+                        break;
+                    case 5 :
+                        space1 = "     ";
+                        break;
+                    case 4 :
+                        space1 = "      ";
+                        break;
+                }
+
                 sb.append(facilityVOList.get(i).getWaterLevel() + "      " + facilityVOList.get(i).getInflow() + "      " + facilityVOList.get(i).getTotalDischarge() + "      " +
                         facilityVOList.get(i).getFall() + "      " + facilityVOList.get(i).getLowYield() + "    " + facilityVOList.get(i).getReservoir() + "   ");
 
