@@ -3,6 +3,7 @@ package com.jbt.water;
 import com.jbt.water.util.ExcelFilType;
 import com.jbt.water.util.ExcelRead;
 import com.jbt.water.util.ExcelReadOption;
+import com.jbt.water.vo.FacilityVO;
 import com.jbt.water.vo.RainFallVO;
 import com.jbt.water.vo.WaterInfoVO;
 import com.jbt.water.vo.WaterVO;
@@ -952,8 +953,10 @@ public class WaterService {
     }
 
     public void insertFacility() throws IOException {
-
-        String filePath = "C:\\Users\\W\\Desktop\\facility.hyd";
+        if(waterMapper.countFacility() != 0) {
+            waterMapper.deleteFacility();
+        }
+        String filePath = "C:\\Users\\srmsq\\Desktop\\facility.hyd";
         File file = new File(filePath);
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "euc-kr"));
 
@@ -996,7 +999,7 @@ public class WaterService {
             facility.add(StringUtils.split(list.get(i)));
         }
 
-        List<RainFallVO> result = new ArrayList<>();
+        List<FacilityVO> result = new ArrayList<>();
         int index = 0;
         for (int i = 0; i < facility.size(); i++) {
             for (int j = 0; j < facility.get(i).length; j+=6) {
@@ -1008,22 +1011,22 @@ public class WaterService {
                     }
                    /*System.out.println(j + " " + id.get(index) + " " + " " + name.get(index) + " " + facility.get(i)[0] + " " +
                                       facility.get(i)[j + 1] + " " + facility.get(i)[j + 2] + " " + facility.get(i)[j + 3] + " " + facility.get(i)[j + 4] + " " + facility.get(i)[j + 5] + " " + facility.get(i)[j + 6]);*/
-                    RainFallVO rainFallVO = new RainFallVO();
-                    rainFallVO.setId(id.get(index));
-                    rainFallVO.setName(name.get(index));
-                    rainFallVO.setYmdHm(facility.get(i)[0].replace("@"," "));
-                    rainFallVO.setWaterLevel( facility.get(i)[j + 1]);
-                    rainFallVO.setInflow( facility.get(i)[j + 2]);
-                    rainFallVO.setTotalDischarge( facility.get(i)[j + 3]);
-                    rainFallVO.setFall(facility.get(i)[j + 4]);
-                    rainFallVO.setLowYield( facility.get(i)[j + 5]);
-                    rainFallVO.setReservoir( facility.get(i)[j + 6]);
-                    result.add(rainFallVO);
+                    FacilityVO facilityVO = new FacilityVO();
+                    facilityVO.setId(id.get(index));
+                    facilityVO.setName(name.get(index));
+                    facilityVO.setYmdHm(facility.get(i)[0].replace("@"," "));
+                    facilityVO.setWaterLevel( facility.get(i)[j + 1]);
+                    facilityVO.setInflow( facility.get(i)[j + 2]);
+                    facilityVO.setTotalDischarge( facility.get(i)[j + 3]);
+                    facilityVO.setFall(facility.get(i)[j + 4]);
+                    facilityVO.setLowYield( facility.get(i)[j + 5]);
+                    facilityVO.setReservoir( facility.get(i)[j + 6]);
+                    result.add(facilityVO);
                 } else {
                     index = 0;
                 }
             }
-            waterMapper.insertRainFall(result);
+            waterMapper.insertFacility(result);
             result.clear();
         }
     }
@@ -1107,8 +1110,59 @@ public class WaterService {
                     }
                 }
             }
-            bw.flush();
 
+            bw.flush();
+            bw.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void generateFacilityFile() {
+        List<FacilityVO> facilityVOList = waterMapper.selectFacility();
+        List<Map<String,String>> facilityIdName = waterMapper.selectFacilityIdName();
+        String fileName = "C:\\Users\\srmsq\\Desktop\\refacility.hyd";
+        File file = new File(fileName);
+
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            if (file.exists()) {
+                file.delete();
+            }
+
+            BufferedWriter bw = new BufferedWriter(new FileWriter(fileName, true));
+            bw.write(facilityIdName.size() + "                ");
+
+            // id + name
+            for (int i = 0; i < facilityIdName.size(); i++) {
+                bw.write(facilityIdName.get(i).get("id") + " " + facilityIdName.get(i).get("name") + "                                            ");
+            }
+
+            int index = facilityIdName.size();
+            // facility
+            for(int i=0; i < facilityVOList.size(); i++) {
+                if (i == index) {
+                    bw.write("\n");
+                    sb.insert(0, facilityVOList.get(index-1).getYmdHm().replace(" ","@") + "   ");
+                    bw.write(sb.toString());
+                    sb.setLength(0);
+                    index += facilityIdName.size();
+                }
+
+                sb.append(facilityVOList.get(i).getWaterLevel() + "      " + facilityVOList.get(i).getInflow() + "      " + facilityVOList.get(i).getTotalDischarge() + "      " +
+                        facilityVOList.get(i).getFall() + "      " + facilityVOList.get(i).getLowYield() + "    " + facilityVOList.get(i).getReservoir() + "   ");
+
+                // 마지막인애는 위에 조건이 안되서
+                if(i+1 == facilityVOList.size()) {
+                    bw.write("\n");
+                    sb.insert(0, facilityVOList.get(index-1).getYmdHm().replace(" ","@") + "   ");
+                    bw.write(sb.toString());
+                }
+
+            }
+
+            bw.flush();
             bw.close();
         } catch (Exception e) {
             e.printStackTrace();

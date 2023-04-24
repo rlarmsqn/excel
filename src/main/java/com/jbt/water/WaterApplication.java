@@ -23,6 +23,7 @@ public class WaterApplication {
 //        service.insertRainFall();
 //        service.generateRainFallFile();
         service.insertFacility();
+        service.generateFacilityFile();
 
     }
 

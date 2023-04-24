@@ -47,6 +47,21 @@
     <insert id="insertRainFall" parameterType="java.util.List">
         INSERT INTO rainfall (
             ID,
+            YMD_HM,
+            FALL
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+        (
+            #{item.id},
+            #{item.ymdHm},
+            #{item.fall}
+        )
+        </foreach>
+    </insert>
+
+    <insert id="insertFacility" parameterType="java.util.List">
+        INSERT INTO FACILITY (
+            ID,
             NAME,
             YMD_HM,
             WATER_LEVEL,
@@ -76,14 +91,34 @@
     </select>
 
     <select id="selectRainFallId" resultType="String">
-        SELECT DISTINCT id from rainfall ORDER BY id
+        SELECT DISTINCT id FROM rainfall ORDER BY id
     </select>
+
+    <select id="selectFacility" resultType="com.jbt.water.vo.FacilityVO">
+        SELECT * FROM facility
+    </select>
+
+    <select id="selectFacilityIdName" resultMap="selectMapList">
+        SELECT DISTINCT id, name FROM facility ORDER BY id
+    </select>
+    <resultMap id="selectMapList" type="map">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+    </resultMap>
 
     <select id="countRainFall" resultType="Integer">
         SELECT COUNT(*) FROM rainfall
     </select>
 
+    <select id="countFacility" resultType="Integer">
+        SELECT COUNT(*) FROM facility
+    </select>
+
     <delete id="deleteRainFall">
         DELETE FROM rainfall
+    </delete>
+
+    <delete id="deleteFacility">
+        DELETE FROM facility
     </delete>
 </mapper>
