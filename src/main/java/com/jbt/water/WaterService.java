@@ -1132,11 +1132,17 @@ public class WaterService {
             }
 
             BufferedWriter bw = new BufferedWriter(new FileWriter(fileName, true));
-            bw.write(facilityIdName.size() + "                ");
+//            bw.write(facilityIdName.size() + "                ");
+            bw.write(String.format("%-18s", facilityIdName.size()));
 
             // id + name
             for (int i = 0; i < facilityIdName.size(); i++) {
-                bw.write(facilityIdName.get(i).get("id") + " " + facilityIdName.get(i).get("name") + "                                            ");
+//                bw.write(facilityIdName.get(i).get("id") + " " + facilityIdName.get(i).get("name") + "                                            ");
+                if(i == 0) {
+                    bw.write(facilityIdName.get(i).get("id") + " " + facilityIdName.get(i).get("name"));
+                } else {
+                    bw.write(String.format("%46s", facilityIdName.get(i).get("id") + " " + facilityIdName.get(i).get("name")));
+                }
             }
 
             int index = facilityIdName.size();
@@ -1144,32 +1150,19 @@ public class WaterService {
             for(int i=0; i < facilityVOList.size(); i++) {
                 if (i == index) {
                     bw.write("\n");
-                    sb.insert(0, facilityVOList.get(index-1).getYmdHm().replace(" ","@") + "   ");
+                    sb.insert(0, String.format("%-17s",facilityVOList.get(index-1).getYmdHm().replace(" ","@")));
                     bw.write(sb.toString());
                     sb.setLength(0);
                     index += facilityIdName.size();
                 }
 
-                String space1 = null;
-                switch (facilityVOList.get(i).getWaterLevel().length()) {
-                    case 6 :
-                        space1 = "    ";
-                        break;
-                    case 5 :
-                        space1 = "     ";
-                        break;
-                    case 4 :
-                        space1 = "      ";
-                        break;
-                }
-
-                sb.append(facilityVOList.get(i).getWaterLevel() + "      " + facilityVOList.get(i).getInflow() + "      " + facilityVOList.get(i).getTotalDischarge() + "      " +
-                        facilityVOList.get(i).getFall() + "      " + facilityVOList.get(i).getLowYield() + "    " + facilityVOList.get(i).getReservoir() + "   ");
+                sb.append(String.format("%8s",facilityVOList.get(i).getWaterLevel()) + String.format("%10s",facilityVOList.get(i).getInflow()) + String.format("%10s",facilityVOList.get(i).getTotalDischarge()) +
+                          String.format("%10s",facilityVOList.get(i).getFall()) + String.format("%10s",facilityVOList.get(i).getLowYield()) + String.format("%10s",facilityVOList.get(i).getReservoir()));
 
                 // 마지막인애는 위에 조건이 안되서
                 if(i+1 == facilityVOList.size()) {
                     bw.write("\n");
-                    sb.insert(0, facilityVOList.get(index-1).getYmdHm().replace(" ","@") + "   ");
+                    sb.insert(0, facilityVOList.get(index-1).getYmdHm().replace(" ","@") + " ");
                     bw.write(sb.toString());
                 }
 
