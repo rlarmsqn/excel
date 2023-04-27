@@ -1,113 +1,16 @@
 package com.jbt.water;
 
-import com.jbt.water.vo.WaterVO;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.eventusermodel.XSSFReader;
-import org.apache.poi.xssf.extractor.XSSFExportToXml;
-import org.apache.poi.xssf.usermodel.XSSFMap;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 public class Test {
-    /*public static void main(String[] args) throws Exception {
-        String filePath = "C:\\Users\\srmsq\\Desktop";
-        String fileName = "Phiengluang.xlsx";
-        OPCPackage pkg = OPCPackage.open(new File(filePath, fileName));
-        XSSFWorkbook wb = new XSSFWorkbook(pkg);
+    public static void main(String[] args) throws IOException {
+        String filePath = "C:\\Users\\srmsq\\Desktop\\waterdata\\NN_SCN1.g02.hdf";
+        File file = new File(filePath);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "euc-kr"));
 
-        for (XSSFMap map : wb.getCustomXMLMappings()) {
-            XSSFExportToXml exporter = new XSSFExportToXml(map);
-
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            exporter.exportToXML(os, true);
-            String xml = os.toString("UTF-8");
-            System.out.println(xml);
+        String str;
+        while((str = reader.readLine()) != null) {
+            System.out.println(str);
         }
-        pkg.close();
-    }*/
-    public static void main(String[] args) throws IOException, OpenXML4JException {
-        String filePath = "C:\\Users\\srmsq\\Desktop";
-        String fileName = "Phiengluang.xlsx";
-
-        FileInputStream file = new FileInputStream(new File(filePath, fileName));
-
-        // 엑셀 파일로 Workbook instance를 생성한다.
-        XSSFWorkbook workbook = new XSSFWorkbook(file);
-        OPCPackage opcPackage = OPCPackage.open(new File(filePath, fileName));
-        XSSFReader xssfReader = new XSSFReader(opcPackage);
-
-        System.out.println(xssfReader.getSharedStringsData());
-
-
-        // workbook의 첫번째 sheet를 가저온다.
-        XSSFSheet sheet = workbook.getSheetAt(1);
-
-        // 만약 특정 이름의 시트를 찾는다면 workbook.getSheet("찾는 시트의 이름");
-        // 만약 모든 시트를 순회하고 싶으면
-        // for(Integer sheetNum : workbook.getNumberOfSheets()) {
-        //      XSSFSheet sheet = workbook.getSheetAt(i);
-        // }
-
-        List<WaterVO> list = new ArrayList<>();
-        String year = "";
-
-
-        // 모든 행(row)들을 조회한다.
-        for (Row row : sheet) {
-
-            // 각각의 행에 존재하는 모든 열(cell)을 순회한다.
-            Iterator<Cell> cellIterator = row.cellIterator();
-
-            while (cellIterator.hasNext()) {
-                Cell cell = cellIterator.next();
-
-                WaterVO waterVO = new WaterVO();
-
-                // cell의 타입을 하고, 값을 가져온다.
-                switch (cell.getCellType()) {
-                    case NUMERIC:
-//                        getNumericCellValue 메서드는 기본으로 double형 반환
-//                        System.out.print(String.format("%.2f",cell.getNumericCellValue()) + "\t");
-                        if(String.format("%.2f",cell.getNumericCellValue()).split(".")[0].length() > 4) {
-                            System.out.println("연도 " + cell.getNumericCellValue());
-                        }
-
-//                        if(String.format("%.2f", cell.getNumericCellValue()).length() == 7) {
-//                            year = String.format("%.2f", cell.getNumericCellValue()).substring(0,4);
-//                        } else {
-//                            waterVO.setLevel(Double.parseDouble(String.format("%.2f", cell.getNumericCellValue())));
-//                        }
-
-                        break;
-
-                    case STRING:
-//                        System.out.print(cell.getStringCellValue() + "\t");
-                        break;
-
-                    case BLANK:
-//                        System.out.print("      " + "\t");
-                        break;
-                }
-                if(waterVO.getLevel() != null) {
-                    if(String.valueOf(waterVO.getLevel()).split(".")[0].length() > 4) {
-                        System.out.println("연도 : " + waterVO.getLevel());
-                    }
-                    waterVO.setYmd(year);
-                    list.add(waterVO);
-                }
-            }
-//            System.out.println();
-        }
-
-        workbook.close();
     }
 }

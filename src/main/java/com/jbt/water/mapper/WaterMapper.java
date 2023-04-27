@@ -1,4 +1,4 @@
-package com.jbt.water;
+package com.jbt.water.mapper;
 
 import com.jbt.water.vo.FacilityVO;
 import com.jbt.water.vo.RainFallVO;

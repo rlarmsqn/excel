@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jbt.water.mapper.NN_SCN1_g02Mapper">
+    <insert id="insertConnections" parameterType="Map">
+        INSERT INTO connections (
+            ID,
+            GEOM
+        ) VALUES
+        (
+            #{id},
+            st_geomfromtext(#{geom,jdbcType=VARCHAR}, 3857)
+        )
+    </insert>
+
+    <insert id="insertCrossSectionsInterpolationSurfaces" parameterType="Map">
+        INSERT INTO cross_sections_interpolation_surfaces (
+            THREED_GEOM,
+            USXSID,
+            DSXSID,
+            TRIANGLE_GEOM
+        ) VALUES
+        (
+            st_geomfromtext(#{threed_geom,jdbcType=VARCHAR}, 3857),
+            #{usxsId},
+            #{dsxsId},
+            st_geomfromtext(#{triangle_geom})
+        )
+    </insert>
+
+    <insert id="insertCrossSections" parameterType="String">
+        INSERT INTO cross_sections (
+            GEOM
+        ) VALUES (
+            st_geomfromtext(#{value,jdbcType=VARCHAR}, 3857)
+        )
+    </insert>
+</mapper>

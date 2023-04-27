@@ -1,5 +1,6 @@
-package com.jbt.water;
+package com.jbt.water.service;
 
+import com.jbt.water.mapper.WaterMapper;
 import com.jbt.water.util.ExcelFilType;
 import com.jbt.water.util.ExcelRead;
 import com.jbt.water.util.ExcelReadOption;
@@ -15,7 +16,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Slf4j
@@ -996,7 +996,7 @@ public class WaterService {
 
         // facility info
         for (int i = 8; i < list.size(); i++) {
-            facility.add(StringUtils.split(list.get(i)));
+            facility.add(StringUtils.split(list.get(i))); // 공백길이상관없이 공백기준으로 가져옴
         }
 
         List<FacilityVO> result = new ArrayList<>();
@@ -1131,27 +1131,32 @@ public class WaterService {
                 file.delete();
             }
 
-            BufferedWriter bw = new BufferedWriter(new FileWriter(fileName, true));
+//            BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(fileName, "EUC-KR"));
+
+            OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(file), "EUC-KR");
+
+
+            //BufferedWriter bw = new BufferedWriter(new FileWriter(fileName, true) );
 //            bw.write(facilityIdName.size() + "                ");
-            bw.write(String.format("%-18s", facilityIdName.size()));
+            //bw.write(String.format("%-18s", facilityIdName.size()));
+            osw.write(String.format("%-18s", facilityIdName.size()));
 
             // id + name
             for (int i = 0; i < facilityIdName.size(); i++) {
 //                bw.write(facilityIdName.get(i).get("id") + " " + facilityIdName.get(i).get("name") + "                                            ");
-                if(i == 0) {
-                    bw.write(facilityIdName.get(i).get("id") + " " + facilityIdName.get(i).get("name"));
-                } else {
-                    bw.write(String.format("%46s", facilityIdName.get(i).get("id") + " " + facilityIdName.get(i).get("name")));
-                }
+                //bw.write(String.format("%-55s", facilityIdName.get(i).get("id") + " " + facilityIdName.get(i).get("name")));
+                osw.write(String.format("%-55s", facilityIdName.get(i).get("id") + " " + facilityIdName.get(i).get("name")));
             }
 
             int index = facilityIdName.size();
             // facility
             for(int i=0; i < facilityVOList.size(); i++) {
                 if (i == index) {
-                    bw.write("\n");
+                    //bw.write("\n");
+                    osw.write("\n");
                     sb.insert(0, String.format("%-17s",facilityVOList.get(index-1).getYmdHm().replace(" ","@")));
-                    bw.write(sb.toString());
+//                    bw.write(sb.toString());
+                    osw.write(sb.toString());
                     sb.setLength(0);
                     index += facilityIdName.size();
                 }
@@ -1161,15 +1166,20 @@ public class WaterService {
 
                 // 마지막인애는 위에 조건이 안되서
                 if(i+1 == facilityVOList.size()) {
-                    bw.write("\n");
+//                    bw.write("\n");
+                    osw.write("\n");
                     sb.insert(0, facilityVOList.get(index-1).getYmdHm().replace(" ","@") + " ");
-                    bw.write(sb.toString());
+
+//                    bw.write(sb.toString());
+                    osw.write(sb.toString());
                 }
 
             }
 
-            bw.flush();
-            bw.close();
+//            bw.flush();
+//            bw.close();
+            osw.flush();
+            osw.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
