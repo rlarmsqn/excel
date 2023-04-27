@@ -238,20 +238,23 @@ public class ReadHdf {
             int[] blInfoShape = blInfoArr.getShape();
             Index blInfoIdx =  blInfoArr.getIndex();
 
-            List<String> bivValueList = new ArrayList<>();
+            List<Map<String, String>> bivValueList = new ArrayList<>();
             for(int i = 0, iCount = blInfoShape[0]; i < iCount; i++) {
                 for (int j = 0, jCount = blInfoShape[1]; j < jCount; j = j + 2) {
                     int bivIdx = blInfoArr.getInt(blInfoIdx.set(i, j));
                     int bivCount = blInfoArr.getInt(blInfoIdx.set(i, j + 1));
 
-                    System.out.println(i + " => " + bivIdx + ", " + bivCount);
+//                    System.out.println(i + " => " + bivIdx + ", " + bivCount);
 
                     for (int idx = 0; idx < bivCount; idx++) {
-                        System.out.println(bivArr.getDouble(bivArrIdx.set(bivIdx + idx, 0)) + " " + bivArr.getDouble(bivArrIdx.set(bivIdx + idx, 1)) + " " + bivArr.getDouble(bivArrIdx.set(bivIdx + idx, 2)));
+//                        System.out.println(bivArr.getDouble(bivArrIdx.set(bivIdx + idx, 0)) + " " + bivArr.getDouble(bivArrIdx.set(bivIdx + idx, 1)) + " " + bivArr.getDouble(bivArrIdx.set(bivIdx + idx, 2)));
+                        Map map = new HashMap<>();
+                        bivValueList.add(map.put(String.valueOf(i),bivArr.getDouble(bivArrIdx.set(bivIdx + idx, 0)) + " " + bivArr.getDouble(bivArrIdx.set(bivIdx + idx, 1)) + " " + bivArr.getDouble(bivArrIdx.set(bivIdx + idx, 2))));
                     }
                 }
             }
 
+            System.out.println(bivValueList);
 
             /*int[] tinInfoShape = tinInfoArr.getShape();
             Index tinInfoIdx = tinInfoArr.getIndex();
