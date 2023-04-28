@@ -54,8 +54,10 @@ public class NN_SCN1_g02Service {
         String blockedIneffectiveInfo = "Blocked_Ineffective_Info";
         String blockedIneffectiveValues = "Blocked_Ineffective_Values";
         String contrExpanCoef = "Contr_Expan_Coef";
-        String HTSEIS = "Hydraulic_Tables_Starting_Eleveation_and_Increment_Size";
+        String HTSEIS = "Hydraulic_Tables_Starting_Elevation_and_Increment_Size";
         String HTVHS = "Hydraulic_Tables_Vertical_and_Horizontal_Slices";
+        String ineffectiveBlocks = "Ineffective_Blocks";
+        String ineffectiveInfo = "Ineffective_Info";
         String lengths = "Lengths";
         String levees = "Levees";
         String manningInfo = "Manning's_n_Info";
@@ -72,7 +74,7 @@ public class NN_SCN1_g02Service {
 
         ReadHdf readHdf = new ReadHdf();
         readHdf.crossSectionsHdf(file, group, bank, blockedIneffectiveInfo, blockedIneffectiveValues,
-                contrExpanCoef, HTSEIS, HTVHS, lengths, levees, manningInfo, manningValue, polylineInfo, polylinePoints, reachNames,
+                contrExpanCoef, HTSEIS, HTVHS, ineffectiveBlocks, ineffectiveInfo, lengths, levees, manningInfo, manningValue, polylineInfo, polylinePoints, reachNames,
                 riverNames, riverStations, stationElevationInfo, stationElevationValues, stationManningInfo, stationManningValues);
 //        List<Map<String, String>> result = readHdf.crossSectionsHdf(file, group, bank, blockedIneffectiveInfo, blockedIneffectiveValues,
 //                contrExpanCoef, HTSEIS, HTVHS, lengths, levees, manningInfo, manningValue, polylineInfo, polylinePoints, reachNames,
