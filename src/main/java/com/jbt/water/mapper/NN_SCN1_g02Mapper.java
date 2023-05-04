@@ -9,5 +9,10 @@ import java.util.Map;
 public interface NN_SCN1_g02Mapper {
     void insertConnections(Map<String, String> data);
     void insertCrossSectionsInterpolationSurfaces(Map<String, String> data);
-    void insertCrossSections(Map<String, String> data);
+    void insertCrossSections(Map<String, Object> data);
+    void insertJunctions(Map<String, String> data);
+    void insertRiverBankLines(List<String> data);
+    void insertRiverCenterLines(List<Map<String, String>> data);
+    void insertRiverEdgeLines(List<String> data);
+    void insertStorageAreas(List<Map<String, Object>> data);
 }

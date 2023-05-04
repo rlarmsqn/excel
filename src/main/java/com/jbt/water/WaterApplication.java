@@ -29,6 +29,10 @@ public class WaterApplication {
 //        NNSCN1g02Service.insertConnections();
 //        NNSCN1g02Service.insertCrossSectionsInterpolationSurfaces();
         NNSCN1g02Service.insertCrossSections();
+//        NNSCN1g02Service.insertJunctions();
+//        NNSCN1g02Service.insertRiverBankLines();
+//        NNSCN1g02Service.insertRiverCenterLines();
+//        NNSCN1g02Service.insertRiverEdgeLines();
+//        NNSCN1g02Service.insertStorageAreas();
     }
-
 }

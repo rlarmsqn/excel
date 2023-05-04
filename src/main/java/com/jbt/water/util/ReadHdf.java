@@ -1,6 +1,5 @@
 package com.jbt.water.util;
 
-import jdk.swing.interop.SwingInterOpUtils;
 import org.apache.commons.lang3.StringUtils;
 import ucar.ma2.Array;
 import ucar.ma2.Index;
@@ -9,6 +8,7 @@ import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -199,15 +199,15 @@ public class ReadHdf {
         return result;
     }
 
-    public void crossSectionsHdf(String fileName, String groupName, String bankName, String biiName, String bivName, String cecName,
+    public Map<String, Object> crossSectionsHdf(String fileName, String groupName, String bankName, String biiName, String bivName, String cecName,
                                                       String htseisName, String htvhsName, String ineffectiveBlocksName, String ineffectiveInfoName, String lengthsName, String leveesName, String miName, String mvName,
                                                       String piName, String ppName, String reachName, String riverName, String riverSName, String seiName, String sevName,
                                                       String smiName, String smvName) {
 
         NetcdfFile dataFile = null;
 
-        List<Map<String, Object>> result = new ArrayList<>();
-
+        Map<String, Object> result = new HashMap<>();
+        
         try {
             dataFile = NetcdfFile.open(fileName);
 
@@ -217,18 +217,18 @@ public class ReadHdf {
             Variable bank = dataFile.findVariable(group, bankName);
             Array bankArr = bank.read();
             String[] bankValue = StringUtils.split(String.valueOf(bankArr)," ");
-            List<String> leftBank = new ArrayList<>();
-            List<String> rightBank = new ArrayList<>();
+            List<String> leftBankList = new ArrayList<>();
+            List<String> rightBankList = new ArrayList<>();
             for(int i=0; i < bankValue.length; i++) {
                 if(i%2 == 0) {
-                    leftBank.add(bankValue[i]);
+                    leftBankList.add(bankValue[i]);
                 } else {
-                    rightBank.add(bankValue[i]);
+                    rightBankList.add(bankValue[i]);
                 }
             }
 
-            // Blocked Ineffective
-            Variable blInfo = dataFile.findVariable(group, biiName);
+            // Blocked Ineffective = ineffective Blocks
+            /*Variable blInfo = dataFile.findVariable(group, biiName);
             Array blInfoArr = blInfo.read();
 
             Variable bivValues = dataFile.findVariable(group, bivName);
@@ -238,10 +238,10 @@ public class ReadHdf {
             int[] blInfoShape = blInfoArr.getShape();
             Index blInfoIdx =  blInfoArr.getIndex();
 
-//            List<Map<String, String>> bivValueList = new ArrayList<>();
-//            List<Map<String, String>> ineffectiveLeft = new ArrayList<>();
-//            List<Map<String, String>> ineffectiveRight = new ArrayList<>();
-//            List<Map<String, String>> ineffectiveElevation = new ArrayList<>();
+            List<Map<String, String>> bivValueList = new ArrayList<>();
+            List<Map<String, String>> ineffectiveLeft = new ArrayList<>();
+            List<Map<String, String>> ineffectiveRight = new ArrayList<>();
+            List<Map<String, String>> ineffectiveElevation = new ArrayList<>();
             for(int i = 0, iCount = blInfoShape[0]; i < iCount; i++) {
                 for (int j = 0, jCount = blInfoShape[1]; j < jCount; j = j + 2) {
                     int bivIdx = blInfoArr.getInt(blInfoIdx.set(i, j));
@@ -254,25 +254,25 @@ public class ReadHdf {
                         map1.put(String.valueOf(i), String.valueOf(bivArr.getDouble(bivArrIdx.set(bivIdx + idx, 0))));
                         map2.put(String.valueOf(i), String.valueOf(bivArr.getDouble(bivArrIdx.set(bivIdx + idx, 1))));
                         map3.put(String.valueOf(i), String.valueOf(bivArr.getDouble(bivArrIdx.set(bivIdx + idx, 2))));
-//                        ineffectiveLeft.add(map1);
-//                        ineffectiveRight.add(map2);
-//                        ineffectiveElevation.add(map3);
-//                        bivValueList.add(map);
+                        ineffectiveLeft.add(map1);
+                        ineffectiveRight.add(map2);
+                        ineffectiveElevation.add(map3);
+                        bivValueList.add(map);
                     }
                 }
-            }
+            }*/
 
             // Contr Expan Coef
             Variable cec = dataFile.findVariable(group, cecName);
             Array cecArr = cec.read();
             String[] cecValue = StringUtils.split(String.valueOf(cecArr)," ");
-            List<String> contractionCoef = new ArrayList<>();
-            List<String> expansionCoef = new ArrayList<>();
+            List<String> contractionCoefList = new ArrayList<>();
+            List<String> expansionCoefList = new ArrayList<>();
             for(int i=0; i < cecValue.length; i++) {
                 if(i%2 == 0) {
-                    contractionCoef.add(cecValue[i]);
+                    contractionCoefList.add(cecValue[i]);
                 } else {
-                    expansionCoef.add(cecValue[i]);
+                    expansionCoefList.add(cecValue[i]);
                 }
             }
 
@@ -280,13 +280,13 @@ public class ReadHdf {
             Variable htseis = dataFile.findVariable(group, htseisName);
             Array htseisArr = htseis.read();
             String[] htseisValue = StringUtils.split(String.valueOf(htseisArr)," ");
-            List<String> startingElevation = new ArrayList<>();
-            List<String> verticalIncrement = new ArrayList<>();
+            List<String> startingElevationList = new ArrayList<>();
+            List<String> verticalIncrementList = new ArrayList<>();
             for(int i=0; i < htseisValue.length; i++) {
                 if(i%2 == 0) {
-                    startingElevation.add(htseisValue[i]);
+                    startingElevationList.add(htseisValue[i]);
                 } else {
-                    verticalIncrement.add(htseisValue[i]);
+                    verticalIncrementList.add(htseisValue[i]);
                 }
             }
 
@@ -294,32 +294,34 @@ public class ReadHdf {
             Variable htvhs = dataFile.findVariable(group, htvhsName);
             Array htvhsArr = htvhs.read();
             String[] htvhsValue = StringUtils.split(String.valueOf(htvhsArr)," ");
-            List<String> verticalSlices = new ArrayList<>();
-            List<String> lobSlices = new ArrayList<>();
-            List<String> channelSlices = new ArrayList<>();
-            List<String> robSlices = new ArrayList<>();
+            List<String> verticalSlicesList = new ArrayList<>();
+            List<String> lobSlicesList = new ArrayList<>();
+            List<String> channelSlicesList = new ArrayList<>();
+            List<String> robSlicesList = new ArrayList<>();
             int lobSlicesIdx = 1;
             int channelSlicesIdx = 2;
             for(int i=0; i < htvhsValue.length; i++) {
                 if(i%4 == 0) {
-                    verticalSlices.add(htvhsValue[i]);
+                    verticalSlicesList.add(htvhsValue[i]);
                 } else if(lobSlicesIdx == i) {
-                    lobSlices.add(htvhsValue[i]);
+                    lobSlicesList.add(htvhsValue[i]);
                     lobSlicesIdx += 4;
                 } else if(channelSlicesIdx == i) {
-                    channelSlices.add(htvhsValue[i]);
+                    channelSlicesList.add(htvhsValue[i]);
                     channelSlicesIdx += 4;
                 } else {
-                    robSlices.add(htvhsValue[i]);
+                    robSlicesList.add(htvhsValue[i]);
                 }
             }
 
-            // Ineffective
+            // Ineffective Blocks
             Variable ineffectivInfo = dataFile.findVariable(group, ineffectiveInfoName);
             Array ineffectivInfoArr = ineffectivInfo.read();
 
             Variable ineffectiveBlocks = dataFile.findVariable(group, ineffectiveBlocksName);
             Array ineffectiveBlocksArr = ineffectiveBlocks.read();
+            Index ineffectiveBlocksIdx = ineffectiveBlocksArr.getIndex();
+
             List<String> ineffectiveBlocksValues = new ArrayList<>();
             int cnt = 0;
             StringBuilder sb = new StringBuilder();
@@ -340,53 +342,77 @@ public class ReadHdf {
             Index ineffectivInfoIdx =  ineffectivInfoArr.getIndex();
 
 //            List<Map<String, String>> ineffectiveList = new ArrayList<>();
-            List<Map<String, String>> ineffectiveLeft = new ArrayList<>();
-            List<Map<String, String>> ineffectiveRight = new ArrayList<>();
-            List<Map<String, String>> ineffectiveElevation = new ArrayList<>();
-            List<Map<String, String>> ineffectivePermanent = new ArrayList<>();
+//            List<Map<String, String>> ineffectiveLeftList = new ArrayList<>();
+//            List<Map<String, String>> ineffectiveRightList = new ArrayList<>();
+//            List<Map<String, String>> ineffectiveElevationList = new ArrayList<>();
+//            List<Map<String, String>> ineffectivePermanentList = new ArrayList<>();
             int cnt2 = 0;
+            Map<Integer, String> ineffectiveBlocksMap = new HashMap<>();
             for(int i = 0, iCount = ineffectivInfoShape[0]; i < iCount; i++) {
-                for (int j = 0, jCount = ineffectivInfoShape[1]; j < jCount; j = j + 2) {
+                for (int j = 0, jCount = ineffectivInfoShape[1]; j < jCount; j = j + 4) {
                     int ineffectivCount = ineffectivInfoArr.getInt(ineffectivInfoIdx.set(i, j + 1));
+                    StringBuilder sbGeom = new StringBuilder("MULTIPOINT ZM(");
+
+                    Map<Integer, String> map = new HashMap<>();
 
                     for (int idx = 0; idx < ineffectivCount; idx++) {
+
+                        sbGeom.append(ineffectiveBlocksValues.get(cnt2));
+//                        sbGeom.append(" ");
+//                        sbGeom.append(ineffectiveBlocksArr.getDouble(ineffectiveBlocksIdx.set(ineffectivStartIdx+idx, 1)));
+//                        sbGeom.append(" ");
+//                        sbGeom.append(ineffectiveBlocksArr.getDouble(ineffectiveBlocksIdx.set(ineffectivStartIdx+idx, 2)));
+//                        sbGeom.append(" ");
+//                        sbGeom.append(ineffectiveBlocksArr.getDouble(ineffectiveBlocksIdx.set(ineffectivStartIdx+idx, 3)));
+                        if(idx > (ineffectivCount-1)) {
+                            sbGeom.append(" ");
+                        }
+
+                        if(idx < (ineffectivCount-1)) {
+                            sbGeom.append(", ");
+                        }
 //                        Map<String, String> map = new HashMap<>();
 
 //                        map.put(String.valueOf(i), ineffectiveBlocksValues.get(cnt2));
 //                        ineffectiveList.add(map);
-                        Map<String, String> map1 = new HashMap<>();
+                      /*  Map<String, String> map1 = new HashMap<>();
                         Map<String, String> map2 = new HashMap<>();
                         Map<String, String> map3 = new HashMap<>();
                         Map<String, String> map4 = new HashMap<>();
-                        map1.put(String.valueOf(i), String.valueOf(bivArr.getDouble(bivArrIdx.set(bivIdx + idx, 0))));
-                        map2.put(String.valueOf(i), String.valueOf(bivArr.getDouble(bivArrIdx.set(bivIdx + idx, 1))));
-                        map3.put(String.valueOf(i), String.valueOf(bivArr.getDouble(bivArrIdx.set(bivIdx + idx, 2))));
-                        ineffectiveLeft.add(map1);
-                        ineffectiveRight.add(map2);
-                        ineffectiveElevation.add(map3);
-                        ineffectivePermanent.add(map4);
+                        map1.put(String.valueOf(i), ineffectiveBlocksValues.get(cnt2));
+                        map2.put(String.valueOf(i), ineffectiveBlocksValues.get(cnt2));
+                        map3.put(String.valueOf(i), ineffectiveBlocksValues.get(cnt2));
+                        ineffectiveLeftList.add(map1);
+                        ineffectiveRightList.add(map2);
+                        ineffectiveElevationList.add(map3);
+                        ineffectivePermanentList.add(map4);*/
                         cnt2++;
+                    }
+                    sbGeom.append(")");
+                    if(!sbGeom.toString().equals("MULTIPOINT ZM()")) {
+                        ineffectiveBlocksMap.put(i, sbGeom.toString());
+//                        ineffectiveBlocksList.add(map);
                     }
                 }
             }
-            System.out.println(ineffectiveList);
+
 
             // Lengths
             Variable lengths = dataFile.findVariable(group, lengthsName);
             Array lengthsArr = lengths.read();
             String[] lengthsValue = StringUtils.split(String.valueOf(lengthsArr)," ");
-            List<String> lengthLob = new ArrayList<>();
-            List<String> lengthChan = new ArrayList<>();
-            List<String> lengthRob = new ArrayList<>();
+            List<String> lengthLobList = new ArrayList<>();
+            List<String> lengthChanList = new ArrayList<>();
+            List<String> lengthRobList = new ArrayList<>();
             int lengthChanIdx = 1;
             for(int i=0; i < lengthsValue.length; i++) {
                 if(i%3 == 0) {
-                    lengthLob.add(lengthsValue[i]);
+                    lengthLobList.add(lengthsValue[i]);
                 } else if(lengthChanIdx == i){
-                    lengthChan.add(lengthsValue[i]);
+                    lengthChanList.add(lengthsValue[i]);
                     lengthChanIdx+=3;
                 } else {
-                    lengthRob.add(lengthsValue[i]);
+                    lengthRobList.add(lengthsValue[i]);
                 }
             }
 
@@ -394,23 +420,23 @@ public class ReadHdf {
             Variable levees = dataFile.findVariable(group, leveesName);
             Array leveesArr = levees.read();
             String[] leveesValue = StringUtils.split(String.valueOf(leveesArr)," ");
-            List<String> leftLeveeSta = new ArrayList<>();
-            List<String> leftLeveeElev = new ArrayList<>();
-            List<String> rightLeveeSta = new ArrayList<>();
-            List<String> rightLeveeElev = new ArrayList<>();
+            List<String> leftLeveeStaList = new ArrayList<>();
+            List<String> leftLeveeElevList = new ArrayList<>();
+            List<String> rightLeveeStaList = new ArrayList<>();
+            List<String> rightLeveeElevList = new ArrayList<>();
             int leftLeveeElevIdx = 1;
             int rightLeveeIdx = 2;
             for(int i=0; i < htvhsValue.length; i++) {
                 if(i%4 == 0) {
-                    leftLeveeSta.add(leveesValue[i]);
+                    leftLeveeStaList.add(leveesValue[i]);
                 } else if(leftLeveeElevIdx == i) {
-                    leftLeveeElev.add(leveesValue[i]);
+                    leftLeveeElevList.add(leveesValue[i]);
                     leftLeveeElevIdx += 4;
                 } else if(rightLeveeIdx == i) {
-                    rightLeveeSta.add(leveesValue[i]);
+                    rightLeveeStaList.add(leveesValue[i]);
                     rightLeveeIdx += 4;
                 } else {
-                    rightLeveeElev.add(leveesValue[i]);
+                    rightLeveeElevList.add(leveesValue[i]);
                 }
             }
 
@@ -425,17 +451,27 @@ public class ReadHdf {
             int[] ManningInfoShape = ManningInfoArr.getShape();
             Index ManningInfoIdx =  ManningInfoArr.getIndex();
 
-            List<String> stationList = new ArrayList<>();
-            List<String> mannnList = new ArrayList<>();
+            List<String> manningsList = new ArrayList<>();
             for(int i = 0, iCount = ManningInfoShape[0]; i < iCount; i++) {
-                for (int j = 0, jCount = ManningInfoShape[1]; j < jCount; j = j + 2) {
+                for(int j = 0, jCount = ManningInfoShape[1]; j < jCount; j=j+2) {
+
                     int ManningIdx = ManningInfoArr.getInt(ManningInfoIdx.set(i, j));
                     int ManningCount = ManningInfoArr.getInt(ManningInfoIdx.set(i, j + 1));
 
-                    for (int idx = 0; idx < ManningCount; idx++) {
-                        stationList.add(String.valueOf(ManningArr.getDouble(ManningArrIdx.set(ManningIdx+idx, 0))));
-                        mannnList.add(String.valueOf(ManningArr.getDouble(ManningArrIdx.set(ManningIdx+idx, 1))));
+                    StringBuffer sbGeom = new StringBuffer("LINESTRING(");
+
+                    for(int idx = 0; idx < ManningCount; idx++) {
+
+                        sbGeom.append(ManningArr.getDouble(ManningArrIdx.set(ManningIdx+idx, 0)));
+                        sbGeom.append(" ");
+                        sbGeom.append(ManningArr.getDouble(ManningArrIdx.set(ManningIdx+idx, 1)));
+
+                        if(idx < (ManningCount-1)) {
+                            sbGeom.append(", ");
+                        }
                     }
+                    sbGeom.append(")");
+                    manningsList.add(sbGeom.toString());
                 }
             }
 
@@ -536,8 +572,9 @@ public class ReadHdf {
                 }
             }
 
+
             // Station Manning's
-            Variable smInfo = dataFile.findVariable(group, smiName);
+            /*Variable smInfo = dataFile.findVariable(group, smiName);
             Array smInfoArr = smInfo.read();
 
             Variable smPoints = dataFile.findVariable(group, smvName);
@@ -569,25 +606,88 @@ public class ReadHdf {
                     sbGeom.append(")");
                     stationManningList.add(sbGeom.toString());
                 }
+            }*/
+
+            // Attributes
+            Variable attributes = dataFile.findVariable(group, "Attributes");
+            Array attributesArr = attributes.read();
+            int attributesSize = (int) attributesArr.getSize();
+
+            result.put("leftBank", leftBankList);
+            result.put("rightBank", rightBankList);
+//            result.put("ineffectiveLeft", ineffectiveLeftList);
+//            result.put("ineffectiveRight", ineffectiveRightList);
+//            result.put("ineffectiveElevation", ineffectiveElevationList);
+            result.put("contractionCoef", contractionCoefList);
+            result.put("expansionCoef", expansionCoefList);
+            result.put("startingElevation", startingElevationList);
+            result.put("verticalIncrement", verticalIncrementList);
+            result.put("verticalSlices", verticalSlicesList);
+            result.put("lobSlices", lobSlicesList);
+            result.put("channelSlices", channelSlicesList);
+            result.put("robSlices", robSlicesList);
+            result.put("ineffectiveGeom", ineffectiveBlocksMap);
+//            result.put("ineffectiveLeft", ineffectiveLeftList);
+//            result.put("ineffectiveRight", ineffectiveRightList);
+//            result.put("ineffectiveElevation", ineffectiveElevationList);
+//            result.put("ineffectivePermanent", ineffectivePermanentList);
+            result.put("lengthLob", lengthLobList);
+            result.put("lengthRob", lengthRobList);
+            result.put("lengthChan", lengthChanList);
+            result.put("leftLeveeSta", leftLeveeStaList);
+            result.put("leftLeveeElev", leftLeveeElevList);
+            result.put("rightLeveeSta", rightLeveeStaList);
+            result.put("rightLeveeElev", rightLeveeElevList);
+            result.put("mannings", manningsList);
+            result.put("polyLine", polylineList);
+            result.put("reachNames", reachNamesList);
+            result.put("riverNames", riverNamesList);
+            result.put("riverStations", riverStationsList);
+            result.put("stationElevation", stationElevationList);
+            result.put("size", attributesSize);
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+        } finally {
+            if (dataFile != null) {
+                try {
+                    dataFile.close();
+                } catch (IOException e) {
+                    e.printStackTrace(System.err);
+                }
             }
+        }
+        
+        return result;
 
-            Map<String, Object> map = new HashMap<>(){{
-                put("leftBank", leftBank);
-                put("rightBank", rightBank);
-                put("ineffectiveLeft", ineffectiveLeft);
-                put("ineffectiveRight", ineffectiveRight);
-                put("ineffectiveElevation", ineffectiveElevation);
-                put("contractionCoef", contractionCoef);
-                put("expansionCoef", expansionCoef);
-                put("startingElevation", startingElevation);
-                put("verticalSlices", verticalSlices);
-                put("lobSlices", lobSlices);
-                put("channelSlices", channelSlices);
-                put("robSlices", robSlices);
+    }
 
-            }};
+    public Map<String, String> junctionsReadHdf(String fileName, String groupName, String names, String pointsName) {
+        NetcdfFile dataFile = null;
 
-            result.add(map);
+        Map<String, String> result = new HashMap<>();
+
+        try {
+            dataFile = NetcdfFile.open(fileName);
+
+            Group group = dataFile.findGroup(groupName);
+
+            Variable junctionsNames = dataFile.findVariable(group, names);
+            Array junctionsNamesArr = junctionsNames.read();
+
+            Variable junctionsPoints = dataFile.findVariable(group, pointsName);
+            Array junctionsPointsArr = junctionsPoints.read();
+
+            StringBuilder geom = new StringBuilder("POINT(");
+            for(int i=0; i < junctionsPointsArr.getSize(); i++) {
+                geom.append(junctionsPointsArr.getDouble(i));
+                if(i + 1 < junctionsPointsArr.getSize()) {
+                    geom.append(" ");
+                }
+            }
+            geom.append(")");
+
+            result.put("name", junctionsNamesArr.toString());
+            result.put("geom", geom.toString());
 
         } catch (Exception e) {
             e.printStackTrace(System.err);
@@ -601,5 +701,413 @@ public class ReadHdf {
             }
         }
 
+        return result;
     }
+
+    public List<String> riverBankLinesReadHdf(String fileName, String groupName, String infoName, String pointsName) {
+        NetcdfFile dataFile = null;
+
+        List<String> result = new ArrayList<>();
+
+        try {
+            dataFile = NetcdfFile.open(fileName);
+
+            Group group = dataFile.findGroup(groupName);
+
+            Variable riverBankLineInfo = dataFile.findVariable(group, infoName);
+            Array riverBankLineInfoArr = riverBankLineInfo.read();
+
+            Variable riverBankLinePoints = dataFile.findVariable(group, pointsName);
+            Array riverBankLinePointsArr = riverBankLinePoints.read();
+            Index riverBankLinePointsIdx = riverBankLinePointsArr.getIndex();
+
+
+            int[] riverBankLineInfoShape = riverBankLineInfoArr.getShape();
+            Index riverBankLineInfoIdx = riverBankLineInfoArr.getIndex();
+
+            for(int i = 0, iCount = riverBankLineInfoShape[0]; i < iCount; i++) {
+                for(int j = 0, jCount = riverBankLineInfoShape[1]; j < jCount; j=j+4) {
+
+                    int pointStartIdx = riverBankLineInfoArr.getInt(riverBankLineInfoIdx.set(i, j));
+                    int pointCount = riverBankLineInfoArr.getInt(riverBankLineInfoIdx.set(i, j+1));
+
+                    StringBuilder geom = new StringBuilder("LINESTRING(");
+                    Map<String, String> map = new HashMap<>();
+
+                    for(int idx = 0; idx < pointCount; idx++) {
+
+                        geom.append(riverBankLinePointsArr.getDouble(riverBankLinePointsIdx.set(pointStartIdx+idx, 0)));
+                        geom.append(" ");
+                        geom.append(riverBankLinePointsArr.getDouble(riverBankLinePointsIdx.set(pointStartIdx+idx, 1)));
+
+                        if(idx < (pointCount-1)) {
+                            geom.append(", ");
+                        }
+                    }
+                    geom.append(")");
+
+                    result.add(geom.toString());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+        } finally {
+            if (dataFile != null) {
+                try {
+                    dataFile.close();
+                } catch (IOException e) {
+                    e.printStackTrace(System.err);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public List<Map<String, String>> riverCenterlinesReadHdf(String fileName, String groupName, String dsJunctionName, String dsSa_2DName, String polyLineInfoName,
+                                                String polyLinePointsName, String reachName, String riverName, String usJunctionName, String usSa_2DName) {
+        NetcdfFile dataFile = null;
+
+        List<Map<String, String>> result = new ArrayList<>();
+
+        try {
+            dataFile = NetcdfFile.open(fileName);
+
+            Group group = dataFile.findGroup(groupName);
+
+            Variable dsJunction = dataFile.findVariable(group, dsJunctionName);
+            Array dsJunctionArr = dsJunction.read();
+            String[] dsJunctionValues = StringUtils.split(dsJunctionArr.toString(), ",");
+            List<String> dsJuctionList = new ArrayList<>();
+            for (String dsJunctionValue : dsJunctionValues) {
+                if (dsJunctionValue.trim().equals("")) {
+                    dsJuctionList.add("null");
+                } else {
+                    dsJuctionList.add(dsJunctionValue.trim());
+                }
+            }
+
+
+            Variable dsSa_2D = dataFile.findVariable(group, dsSa_2DName);
+            Array dsSa_2DArr = dsSa_2D.read();
+            String[] dsSa_2DValues = StringUtils.split(dsSa_2DArr.toString(), ",");
+            List<String> dsSa_2DList = new ArrayList<>();
+            for (String dsSa_2DValue : dsSa_2DValues) {
+                if (dsSa_2DValue.trim().equals("")) {
+                    dsSa_2DList.add("null");
+                } else {
+                    dsSa_2DList.add(dsSa_2DValue.trim());
+                }
+            }
+
+
+            Variable polyLineInfo = dataFile.findVariable(group, polyLineInfoName);
+            Array polyLineInfoArr = polyLineInfo.read();
+
+            Variable polyLinePoints = dataFile.findVariable(group, polyLinePointsName);
+            Array polyLinePointsArr = polyLinePoints.read();
+            Index polyLinePointsIdx = polyLinePointsArr.getIndex();
+
+            int[] polyLineShape = polyLineInfoArr.getShape();
+            Index polyLineIdx = polyLineInfoArr.getIndex();
+
+            List<String> polyLineList = new ArrayList<>();
+            for(int i = 0, iCount = polyLineShape[0]; i < iCount; i++) {
+                for(int j = 0, jCount = polyLineShape[1]; j < jCount; j=j+4) {
+
+                    int pointStartIdx = polyLineInfoArr.getInt(polyLineIdx.set(i, j));
+                    int pointCount = polyLineInfoArr.getInt(polyLineIdx.set(i, j+1));
+
+                    StringBuilder geom = new StringBuilder("LINESTRING(");
+
+                    for(int idx = 0; idx < pointCount; idx++) {
+
+                        geom.append(polyLinePointsArr.getDouble(polyLinePointsIdx.set(pointStartIdx+idx, 0)));
+                        geom.append(" ");
+                        geom.append(polyLinePointsArr.getDouble(polyLinePointsIdx.set(pointStartIdx+idx, 1)));
+
+                        if(idx < (pointCount-1)) {
+                            geom.append(", ");
+                        }
+                    }
+                    geom.append(")");
+
+                    polyLineList.add(geom.toString());
+                }
+            }
+
+
+            Variable reachNames = dataFile.findVariable(group, reachName);
+            Array reachNamesArr = reachNames.read();
+            String[] reachNamesValues = StringUtils.split(reachNamesArr.toString(), ",");
+            List<String> reachNamesList = new ArrayList<>();
+            for (String reachNamesValue : reachNamesValues) {
+                if (reachNamesValue.trim().equals("")) {
+                    reachNamesList.add("null");
+                } else {
+                    reachNamesList.add(reachNamesValue.trim());
+                }
+            }
+
+
+            Variable riverNames = dataFile.findVariable(group, riverName);
+            Array riverNamesArr = riverNames.read();
+            String[] riverNamesValues = StringUtils.split(riverNamesArr.toString(), ",");
+            List<String> riverNamesList = new ArrayList<>();
+            for (String riverNamesValue : riverNamesValues) {
+                if (riverNamesValue.trim().equals("")) {
+                    riverNamesList.add("null");
+                } else {
+                    riverNamesList.add(riverNamesValue.trim());
+                }
+            }
+
+
+            Variable usJunction = dataFile.findVariable(group, usJunctionName);
+            Array usJunctionArr = usJunction.read();
+            String[] usJunctionValues = StringUtils.split(usJunctionArr.toString(), ",");
+            List<String> usJunctionList = new ArrayList<>();
+            for (String usJunctionValue : usJunctionValues) {
+                if (usJunctionValue.trim().equals("")) {
+                    usJunctionList.add("null");
+
+                } else {
+                    usJunctionList.add(usJunctionValue.trim());
+                }
+            }
+
+
+            Variable usSa_2D = dataFile.findVariable(group, usSa_2DName);
+            Array usSa_2DArr = usSa_2D.read();
+            String[] usSa_2DValues = StringUtils.split(usSa_2DArr.toString(), ",");
+            List<String> usSa_2DList = new ArrayList<>();
+            for (String usSa_2DValue : usSa_2DValues) {
+                if (usSa_2DValue.trim().equals("")) {
+                    usSa_2DList.add("null");
+                } else {
+                    usSa_2DList.add(usSa_2DValue.trim());
+                }
+            }
+
+            // Attributes
+            Variable attributes = dataFile.findVariable(group, "Attributes");
+            Array attributesArr = attributes.read();
+            int attributesSize = (int) attributesArr.getSize();
+
+            for(int i=0; i < attributesSize; i++) {
+                Map<String, String> resultMap = new HashMap<>();
+
+                resultMap.put("dsJunction", dsJuctionList.get(i));
+                resultMap.put("geom", String.valueOf(polyLineList.get(i)));
+                resultMap.put("reachName", reachNamesList.get(i));
+                resultMap.put("riverName", riverNamesList.get(i));
+                resultMap.put("usJunction", usJunctionList.get(i));
+                resultMap.put("dsSa2d", dsSa_2DList.get(i));
+                resultMap.put("usSa2d", usSa_2DList.get(i));
+
+                result.add(resultMap);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+        } finally {
+            if (dataFile != null) {
+                try {
+                    dataFile.close();
+                } catch (IOException e) {
+                    e.printStackTrace(System.err);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public List<String> riverEdgeLinesReadHdf(String fileName, String groupName, String infoName, String pointName) {
+
+        NetcdfFile dataFile = null;
+
+        List<String> result = new ArrayList<>();
+
+        try {
+            dataFile = NetcdfFile.open(fileName);
+
+            Group group = dataFile.findGroup(groupName);
+
+            Variable polylineInfo = dataFile.findVariable(group, infoName);
+            Array polylineInfoArr = polylineInfo.read();
+
+            Variable polylinePoints = dataFile.findVariable(group, pointName);
+            Array polylinePointsArr = polylinePoints.read();
+            Index polylinePointsIdx = polylinePointsArr.getIndex();
+
+
+            int[] polylineInfoShape = polylineInfoArr.getShape();
+            Index polylineInfoIdx = polylineInfoArr.getIndex();
+
+
+            for(int i = 0, iCount = polylineInfoShape[0]; i < iCount; i++) {
+                for(int j = 0, jCount = polylineInfoShape[1]; j < jCount; j=j+4) {
+
+                    int pointStartIdx = polylineInfoArr.getInt(polylineInfoIdx.set(i, j));
+                    int pointCount = polylineInfoArr.getInt(polylineInfoIdx.set(i, j+1));
+
+//                    System.out.println(i + " => " + pointStartIdx + ", " + pointCount + ", " + partStartIdx + ", " + partCount);
+
+                    StringBuffer sbGeom = new StringBuffer("LINESTRING(");
+
+                    for(int idx = 0; idx < pointCount; idx++) {
+
+                        sbGeom.append(polylinePointsArr.getDouble(polylinePointsIdx.set(pointStartIdx+idx, 0)));
+                        sbGeom.append(" ");
+                        sbGeom.append(polylinePointsArr.getDouble(polylinePointsIdx.set(pointStartIdx+idx, 1)));
+
+                        if(idx < (pointCount-1)) {
+                            sbGeom.append(", ");
+                        }
+                    }
+                    sbGeom.append(")");
+
+                    result.add(sbGeom.toString());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+        } finally {
+            if (dataFile != null) {
+                try {
+                    dataFile.close();
+                } catch (IOException e) {
+                    e.printStackTrace(System.err);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public List<Map<String, Object>> storageAreasReadHdf(String fileName, String groupName, String names, String polygonAreaName, String polygonInfoName,
+                                                         String polygonPointsName, String volumeElevationInfoName, String volumeElevationValuesName) {
+
+        NetcdfFile dataFile = null;
+
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        try {
+            dataFile = NetcdfFile.open(fileName);
+
+            Group group = dataFile.findGroup(groupName);
+
+            // Names
+            Variable namesVariable = dataFile.findVariable(group, names);
+            Array namesVariableArr = namesVariable.read();
+            String[] namesVariableValue = StringUtils.split(String.valueOf(namesVariableArr), ",");
+
+            // Polygon Area
+            Variable polygonArea = dataFile.findVariable(group, polygonAreaName);
+            Array polygonAreaArr = polygonArea.read();
+            String[] polygonAreaValue = StringUtils.split(String.valueOf(polygonAreaArr));
+
+            // Polygon
+            Variable polygonInfo = dataFile.findVariable(group, polygonInfoName);
+            Array polygonInfoArr = polygonInfo.read();
+
+            Variable polygonPoints = dataFile.findVariable(group, polygonPointsName);
+            Array polygonPointsArr = polygonPoints.read();
+            Index polygonPointsIdx = polygonPointsArr.getIndex();
+
+
+            int[] polygonInfoShape = polygonInfoArr.getShape();
+            Index polygonInfoIdx = polygonInfoArr.getIndex();
+
+            List<String> polygonGeomList = new ArrayList<>();
+            for(int i = 0, iCount = polygonInfoShape[0]; i < iCount; i++) {
+                for(int j = 0, jCount = polygonInfoShape[1]; j < jCount; j=j+4) {
+
+                    int pointStartIdx = polygonInfoArr.getInt(polygonInfoIdx.set(i, j));
+                    int pointCount = polygonInfoArr.getInt(polygonInfoIdx.set(i, j+1));
+
+                    StringBuffer sbGeom = new StringBuffer("POLYGON((");
+
+                    for(int idx = 0; idx < pointCount; idx++) {
+
+                        sbGeom.append(polygonPointsArr.getDouble(polygonPointsIdx.set(pointStartIdx+idx, 0)));
+                        sbGeom.append(" ");
+                        sbGeom.append(polygonPointsArr.getDouble(polygonPointsIdx.set(pointStartIdx+idx, 1)));
+
+                        if(idx < (pointCount-1)) {
+                            sbGeom.append(", ");
+                        }
+                    }
+                    sbGeom.append("))");
+                    polygonGeomList.add(sbGeom.toString());
+                }
+            }
+
+            // Volume Elevation
+            Variable volumeElevationInfo = dataFile.findVariable(group, volumeElevationInfoName);
+            Array volumeElevationInfoArr = volumeElevationInfo.read();
+
+            Variable volumeElevationPoints = dataFile.findVariable(group, volumeElevationValuesName);
+            Array volumeElevationPointsArr = volumeElevationPoints.read();
+            Index volumeElevationPointsIdx = volumeElevationPointsArr.getIndex();
+
+
+            int[] volumeElevationInfoShape = volumeElevationInfoArr.getShape();
+            Index volumeElevationInfoIdx = volumeElevationInfoArr.getIndex();
+
+            List<String> volumeElevationGeomList = new ArrayList<>();
+            for(int i = 0, iCount = volumeElevationInfoShape[0]; i < iCount; i++) {
+                for(int j = 0, jCount = volumeElevationInfoShape[1]; j < jCount; j=j+4) {
+
+                    int pointStartIdx = volumeElevationInfoArr.getInt(volumeElevationInfoIdx.set(i, j));
+                    int pointCount = volumeElevationInfoArr.getInt(volumeElevationInfoIdx.set(i, j+1));
+
+                    StringBuffer sbGeom = new StringBuffer("LINESTRING(");
+
+                    for(int idx = 0; idx < pointCount; idx++) {
+
+                        sbGeom.append(volumeElevationPointsArr.getDouble(volumeElevationPointsIdx.set(pointStartIdx+idx, 0)));
+                        sbGeom.append(" ");
+                        sbGeom.append(volumeElevationPointsArr.getDouble(volumeElevationPointsIdx.set(pointStartIdx+idx, 1)));
+
+                        if(idx < (pointCount-1)) {
+                            sbGeom.append(", ");
+                        }
+                    }
+                    sbGeom.append(")");
+                    volumeElevationGeomList.add(sbGeom.toString());
+                }
+            }
+
+            // Attributes
+            Variable attributes = dataFile.findVariable(group, "Attributes");
+            Array attributesArr = attributes.read();
+            int attributesSize = (int) attributesArr.getSize();
+
+            for(int i=0; i < attributesSize; i++) {
+                Map<String, Object> resultMap = new HashMap<>();
+                resultMap.put("id", namesVariableValue[i]);
+                resultMap.put("polygonGeom", polygonGeomList.get(i));
+                resultMap.put("polygonArea", BigDecimal.valueOf(Double.parseDouble(polygonAreaValue[i])));
+                resultMap.put("volumeElevationGeom", volumeElevationGeomList.get(i));
+                result.add(resultMap);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+        } finally {
+            if (dataFile != null) {
+                try {
+                    dataFile.close();
+                } catch (IOException e) {
+                    e.printStackTrace(System.err);
+                }
+            }
+        }
+
+        return result;
+
+    }
+
 }

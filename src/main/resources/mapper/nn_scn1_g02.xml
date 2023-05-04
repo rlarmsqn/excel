@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jbt.water.mapper.NN_SCN1_g02Mapper">
+    <insert id="insertConnections" parameterType="Map">
+        INSERT INTO connections (
+            ID,
+            GEOM
+        ) VALUES
+        (
+            #{id},
+            st_geomfromtext(#{geom,jdbcType=VARCHAR}, 3857)
+        )
+    </insert>
+
+    <insert id="insertCrossSectionsInterpolationSurfaces" parameterType="Map">
+        INSERT INTO cross_sections_interpolation_surfaces (
+            THREED_GEOM,
+            USXSID,
+            DSXSID,
+            TRIANGLE_GEOM
+        ) VALUES
+        (
+            st_geomfromtext(#{threed_geom,jdbcType=VARCHAR}, 3857),
+            #{usxsId},
+            #{dsxsId},
+            st_geomfromtext(#{triangle_geom})
+        )
+    </insert>
+
+    <insert id="insertCrossSections" parameterType="Map">
+        INSERT INTO cross_sections (
+            LEFT_BANK,
+            RIGHT_BANK,
+            CONTRACTION_COEF,
+            EXPANSION_COEF,
+            STARTING_ELEVATION,
+            VERTICAL_INCREMENT,
+            VERTICAL_SLICES,
+            LOB_SLICES,
+            CHANNEL_SLICES,
+            ROB_SLICES,
+            LENGTH_LOB,
+            LENGTH_CHAN,
+            LENGTH_ROB,
+            LEFT_LEVEE_STA,
+            LEFT_LEVEE_ELEV,
+            RIGHT_LEVEE_STA,
+            RIGHT_LEVEE_ELEV,
+            MANNING_GEOM,
+            POLYLINE_GEOM,
+            REACH_NAME,
+            RIVER_NAME,
+            RIVER_STATION,
+            STATION_ELEVATION_GEOM,
+            INEFFECTIVE_GEOM
+        ) VALUES (
+            #{leftBank},
+            #{rightBank},
+            #{contractionCoef},
+            #{expansionCoef},
+            #{startingElevation},
+            #{verticalIncrement},
+            #{verticalSlices},
+            #{lobSlices},
+            #{channelSlices},
+            #{robSlices},
+            #{lengthLob},
+            #{lengthRob},
+            #{lengthChan},
+            #{leftLeveeSta},
+            #{leftLeveeElev},
+            #{rightLeveeSta},
+            #{rightLeveeElev},
+            st_geomfromtext(#{mannings}, 3857),
+            st_geomfromtext(#{polyLine}, 3857),
+            #{reachNames},
+            #{riverNames},
+            #{riverStations},
+            st_geomfromtext(#{stationElevation}, 3857),
+            st_geomfromtext(#{ineffectiveGeom}, 3857)
+        )
+    </insert>
+
+    <insert id="insertJunctions" parameterType="Map">
+        INSERT INTO junctions (
+            NAME,
+            GEOM
+        ) VALUES (
+            #{name},
+            st_geomfromtext(#{geom,jdbcType=VARCHAR}, 3857)
+        )
+    </insert>
+
+    <insert id="insertRiverBankLines" parameterType="List">
+        INSERT INTO river_bank_lines (
+            GEOM
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+        (
+            st_geomfromtext(#{item}, 3857)
+        )
+        </foreach>
+    </insert>
+
+    <insert id="insertRiverCenterLines" parameterType="List">
+        INSERT INTO river_centerlines (
+            DS_JUNCTION,
+            GEOM,
+            REACH_NAME,
+            RIVER_NAME,
+            US_JUNCTION,
+            DS_SA_2D,
+            US_SA_2D
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+        (
+            #{item.dsJunction},
+            st_geomfromtext(#{item.geom}, 3857),
+            #{item.reachName},
+            #{item.riverName},
+            #{item.usJunction},
+            #{item.dsSa2d},
+            #{item.usSa2d}
+        )
+        </foreach>
+    </insert>
+
+    <insert id="insertRiverEdgeLines" parameterType="List">
+        INSERT INTO river_edge_lines (
+            GEOM
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+        (
+            st_geomfromtext(#{item}, 3857)
+        )
+        </foreach>
+    </insert>
+
+    <insert id="insertStorageAreas" parameterType="List">
+        INSERT INTO storage_areas (
+            ID,
+            POLYGON_GEOM,
+            POLYGON_AREA,
+            VOLUME_ELEVATION_GEOM
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id},
+            st_geomfromtext(#{item.polygonGeom}, 3857),
+            #{item.polygonArea},
+            st_geomfromtext(#{item.volumeElevationGeom}, 3857)
+            )
+        </foreach>
+    </insert>
+</mapper>
+
