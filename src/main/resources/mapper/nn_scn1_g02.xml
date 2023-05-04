@@ -29,6 +29,7 @@
 
     <insert id="insertCrossSections" parameterType="Map">
         INSERT INTO cross_sections (
+            ID,
             LEFT_BANK,
             RIGHT_BANK,
             CONTRACTION_COEF,
@@ -54,6 +55,7 @@
             STATION_ELEVATION_GEOM,
             INEFFECTIVE_GEOM
         ) VALUES (
+            #{id},
             #{leftBank},
             #{rightBank},
             #{contractionCoef},

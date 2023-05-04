@@ -82,35 +82,60 @@ public class NN_SCN1_g02Service {
 
         Map<Integer, String> ineffectiveGeom = (Map<Integer, String>) result.get("ineffectiveGeom");
 
+        List<String> leftBank = (List<String>) result.get("leftBank");
+        List<String> rightBank = (List<String>) result.get("rightBank");
+        List<String> contractionCoef = (List<String>) result.get("contractionCoef");
+        List<String> expansionCoef = (List<String>) result.get("expansionCoef");
+        List<String> startingElevation = (List<String>) result.get("startingElevation");
+        List<String> verticalIncrement = (List<String>) result.get("verticalIncrement");
+        List<String> verticalSlices = (List<String>) result.get("verticalSlices");
+        List<String> lobSlices = (List<String>) result.get("lobSlices");
+        List<String> channelSlices = (List<String>) result.get("channelSlices");
+        List<String> robSlices = (List<String>) result.get("robSlices");
+        List<String> lengthLob = (List<String>) result.get("lengthLob");
+        List<String> lengthRob = (List<String>) result.get("lengthRob");
+        List<String> lengthChan = (List<String>) result.get("lengthChan");
+        List<String> leftLeveeSta = (List<String>) result.get("leftLeveeSta");
+        List<String> leftLeveeElev = (List<String>) result.get("leftLeveeElev");
+        List<String> rightLeveeSta = (List<String>) result.get("rightLeveeSta");
+        List<String> rightLeveeElev = (List<String>) result.get("rightLeveeElev");
+        List<String> mannings = (List<String>) result.get("mannings");
+        List<String> polyLine = (List<String>) result.get("polyLine");
+        List<String> reachName = (List<String>) result.get("reachNames");
+        List<String> riverName = (List<String>) result.get("riverNames");
+        List<String> riverStation = (List<String>) result.get("riverStations");
+        List<String> stationElevation = (List<String>) result.get("stationElevation");
+
         int size = (int) result.get("size");
         for(int i=0; i < size; i++) {
             Map<String, Object> map = new HashMap<>();
-            map.put("leftBank", ((List<Object>) result.get("leftBank")).get(i));
-            map.put("rightBank", ((List<Object>) result.get("rightBank")).get(i));
-            map.put("contractionCoef", ((List<Object>) result.get("contractionCoef")).get(i));
-            map.put("expansionCoef", ((List<Object>) result.get("expansionCoef")).get(i));
-            map.put("startingElevation", ((List<Object>) result.get("startingElevation")).get(i));
-            map.put("verticalIncrement", ((List<Object>) result.get("verticalIncrement")).get(i));
-            map.put("verticalSlices", ((List<Object>) result.get("verticalSlices")).get(i));
-            map.put("lobSlices", ((List<Object>) result.get("lobSlices")).get(i));
-            map.put("channelSlices", ((List<Object>) result.get("channelSlices")).get(i));
-            map.put("robSlices", ((List<Object>) result.get("robSlices")).get(i));
-            if(ineffectiveGeom.get(i) != null) {
+            map.put("id", i + 1);
+            map.put("leftBank", leftBank.get(i));
+            map.put("rightBank", rightBank.get(i));
+            map.put("contractionCoef", contractionCoef.get(i));
+            map.put("expansionCoef", expansionCoef.get(i));
+            map.put("startingElevation", startingElevation.get(i));
+            map.put("verticalIncrement", verticalIncrement.get(i));
+            map.put("verticalSlices", verticalSlices.get(i));
+            map.put("lobSlices", lobSlices.get(i));
+            map.put("channelSlices", channelSlices.get(i));
+            map.put("robSlices", robSlices.get(i));
+//            if(ineffectiveGeom.get(i) != null) {
                 map.put("ineffectiveGeom", ineffectiveGeom.get(i));
-            }
-            map.put("lengthLob", ((List<Object>) result.get("lengthLob")).get(i));
-            map.put("lengthRob", ((List<Object>) result.get("lengthRob")).get(i));
-            map.put("lengthChan", ((List<Object>) result.get("lengthChan")).get(i));
-            map.put("leftLeveeSta", ((List<Object>) result.get("leftLeveeSta")).get(i));
-            map.put("leftLeveeElev", ((List<Object>) result.get("leftLeveeElev")).get(i));
-            map.put("rightLeveeSta", ((List<Object>) result.get("rightLeveeSta")).get(i));
-            map.put("rightLeveeElev", ((List<Object>) result.get("rightLeveeElev")).get(i));
-            map.put("mannings", ((List<Object>) result.get("mannings")).get(i));
-            map.put("polyLine", ((List<Object>) result.get("polyLine")).get(i));
-            map.put("reachNames", ((List<Object>) result.get("reachNames")).get(i));
-            map.put("riverNames", ((List<Object>) result.get("riverNames")).get(i));
-            map.put("riverStations", ((List<Object>) result.get("riverStations")).get(i));
-            map.put("stationElevation", ((List<Object>) result.get("stationElevation")).get(i));
+//            }
+            map.put("lengthLob", lengthLob.get(i));
+            map.put("lengthRob", lengthRob.get(i));
+            map.put("lengthChan", lengthChan.get(i));
+            map.put("leftLeveeSta", leftLeveeSta.get(i));
+            map.put("leftLeveeElev", leftLeveeElev.get(i));
+            map.put("rightLeveeSta", rightLeveeSta.get(i));
+            map.put("rightLeveeElev", rightLeveeElev.get(i));
+            map.put("mannings", mannings.get(i));
+            map.put("polyLine", polyLine.get(i));
+            map.put("reachNames", reachName.get(i));
+            map.put("riverNames", riverName.get(i));
+            map.put("riverStations", riverStation.get(i));
+            map.put("stationElevation", stationElevation.get(i));
 
             NNSCN1g02Mapper.insertCrossSections(map);
         }
@@ -192,5 +217,15 @@ public class NN_SCN1_g02Service {
         }
         NNSCN1g02Mapper.insertStorageAreas(data);
 
+    }
+
+    public void insertStructures() {
+        String fileName  = "C:\\Users\\srmsq\\Desktop\\waterdata\\NN_SCN1.g02.hdf";
+        String groupName = "Geometry/Structures";
+        String centerLineInfoName = "Centerline_Info";
+        String centerLinePointsName = "Centerline_Points";
+
+        ReadHdf readHdf = new ReadHdf();
+        readHdf.structuresReadHdf(fileName, groupName, centerLineInfoName, centerLinePointsName);
     }
 }

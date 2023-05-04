@@ -15,4 +15,5 @@ public interface NN_SCN1_g02Mapper {
     void insertRiverCenterLines(List<Map<String, String>> data);
     void insertRiverEdgeLines(List<String> data);
     void insertStorageAreas(List<Map<String, Object>> data);
+    void insertStructures(List<Map<String, Object>> data);
 }

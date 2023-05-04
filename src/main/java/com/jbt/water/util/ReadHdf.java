@@ -1110,4 +1110,65 @@ public class ReadHdf {
 
     }
 
+    public void structuresReadHdf(String fileName, String groupName, String centerLineInfoName, String centerLinePointsName) {
+
+        NetcdfFile dataFile = null;
+
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        try {
+            dataFile = NetcdfFile.open(fileName);
+
+            Group group = dataFile.findGroup(groupName);
+            
+            Variable centerLineInfo = dataFile.findVariable(group, centerLineInfoName);
+            Array centerLineInfoArr = centerLineInfo.read();
+
+            Variable centerLinePoints = dataFile.findVariable(group, centerLinePointsName);
+            Array centerLinePointsArr = centerLinePoints.read();
+            Index centerLinePointsIdx = centerLinePointsArr.getIndex();
+
+
+            int[] centerLineInfoShape = centerLineInfoArr.getShape();
+            Index centerLineInfoIdx = centerLineInfoArr.getIndex();
+
+            List<String> centerLineGeomList = new ArrayList<>();
+            for(int i = 0, iCount = centerLineInfoShape[0]; i < iCount; i++) {
+                for(int j = 0, jCount = centerLineInfoShape[1]; j < jCount; j=j+4) {
+
+                    int pointStartIdx = centerLineInfoArr.getInt(centerLineInfoIdx.set(i, j));
+                    int pointCount = centerLineInfoArr.getInt(centerLineInfoIdx.set(i, j+1));
+
+                    StringBuffer sbGeom = new StringBuffer("LINESTRING(");
+
+                    for(int idx = 0; idx < pointCount; idx++) {
+
+                        sbGeom.append(centerLinePointsArr.getDouble(centerLinePointsIdx.set(pointStartIdx+idx, 0)));
+                        sbGeom.append(" ");
+                        sbGeom.append(centerLinePointsArr.getDouble(centerLinePointsIdx.set(pointStartIdx+idx, 1)));
+
+                        if(idx < (pointCount-1)) {
+                            sbGeom.append(", ");
+                        }
+                    }
+                    sbGeom.append(")");
+
+
+                    centerLineGeomList.add(sbGeom.toString());
+                }
+            }
+            System.out.println(centerLineGeomList.size());
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+        } finally {
+            if (dataFile != null) {
+                try {
+                    dataFile.close();
+                } catch (IOException e) {
+                    e.printStackTrace(System.err);
+                }
+            }
+        }
+
+    }
 }
