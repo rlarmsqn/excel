@@ -1,5 +1,6 @@
 package com.jbt.water.util;
 
+import jdk.swing.interop.SwingInterOpUtils;
 import org.apache.commons.lang3.StringUtils;
 import ucar.ma2.Array;
 import ucar.ma2.Index;
@@ -870,7 +871,6 @@ public class ReadHdf {
             for (String usJunctionValue : usJunctionValues) {
                 if (usJunctionValue.trim().equals("")) {
                     usJunctionList.add("null");
-
                 } else {
                     usJunctionList.add(usJunctionValue.trim());
                 }
@@ -1110,36 +1110,38 @@ public class ReadHdf {
 
     }
 
-    public void structuresReadHdf(String fileName, String groupName, String centerLineInfoName, String centerLinePointsName) {
+    public Map<String, Object> structuresReadHdf(String fileName, String groupName) {
 
         NetcdfFile dataFile = null;
 
-        List<Map<String, Object>> result = new ArrayList<>();
+        Map<String, Object> resultMap = new HashMap<>();
 
         try {
             dataFile = NetcdfFile.open(fileName);
 
             Group group = dataFile.findGroup(groupName);
-            
-            Variable centerLineInfo = dataFile.findVariable(group, centerLineInfoName);
+
+            // Centerline
+            Variable centerLineInfo = dataFile.findVariable(group, "Centerline_Info");
             Array centerLineInfoArr = centerLineInfo.read();
 
-            Variable centerLinePoints = dataFile.findVariable(group, centerLinePointsName);
+            Variable centerLinePoints = dataFile.findVariable(group, "Centerline_Points");
             Array centerLinePointsArr = centerLinePoints.read();
             Index centerLinePointsIdx = centerLinePointsArr.getIndex();
-
 
             int[] centerLineInfoShape = centerLineInfoArr.getShape();
             Index centerLineInfoIdx = centerLineInfoArr.getIndex();
 
-            List<String> centerLineGeomList = new ArrayList<>();
+            Map<String, String> centerLineGeomList = new HashMap<>();
             for(int i = 0, iCount = centerLineInfoShape[0]; i < iCount; i++) {
                 for(int j = 0, jCount = centerLineInfoShape[1]; j < jCount; j=j+4) {
 
                     int pointStartIdx = centerLineInfoArr.getInt(centerLineInfoIdx.set(i, j));
                     int pointCount = centerLineInfoArr.getInt(centerLineInfoIdx.set(i, j+1));
 
+
                     StringBuffer sbGeom = new StringBuffer("LINESTRING(");
+                    Map<String, String> map = new HashMap<>();
 
                     for(int idx = 0; idx < pointCount; idx++) {
 
@@ -1153,11 +1155,191 @@ public class ReadHdf {
                     }
                     sbGeom.append(")");
 
+                    if(!sbGeom.toString().equals("LINESTRING()")) {
+//                        System.out.println(i + " " + sbGeom);
+                        centerLineGeomList.put(String.valueOf(i), sbGeom.toString());
+//                        centerLineGeomList.add(map);
+                    }
 
-                    centerLineGeomList.add(sbGeom.toString());
                 }
             }
-            System.out.println(centerLineGeomList.size());
+
+            // Pier Data
+            Variable pierAttribute = dataFile.findVariable(group, "Pier_Attributes");
+            Array pierAttributeArr = pierAttribute.read();
+            List<Map<String, String>> pierAttrData = new ArrayList<>();
+            int cnt7 = 0;
+            for(int i=0; i < pierAttributeArr.getSize(); i++) {
+                ucar.ma2.StructureData sd = (ucar.ma2.StructureData) pierAttributeArr.getObject(i);
+                Map<String, String> map = new HashMap<>();
+
+                for (ucar.ma2.StructureMembers.Member m : sd.getStructureMembers().getMembers()) {
+                    if(cnt7 < 11) {
+                        switch(cnt7) {
+                            case 0:
+                                map.put("id", String.valueOf(sd.getScalarObject(m)));
+                                break;
+                            case 1:
+                                map.put("usStation", String.valueOf(sd.getScalarObject(m)));
+                                break;
+                            case 2:
+                                map.put("dsStation", String.valueOf(sd.getScalarObject(m)));
+                                break;
+                            case 6:
+                                map.put("usIdx", String.valueOf(sd.getScalarObject(m)));
+                                break;
+                            case 7:
+                                map.put("usCnt", String.valueOf(sd.getScalarObject(m)));
+                                break;
+                            case 8:
+                                map.put("dsIdx", String.valueOf(sd.getScalarObject(m)));
+                                break;
+                            case 9:
+                                map.put("dsCnt", String.valueOf(sd.getScalarObject(m)));
+                                break;
+                        }
+//                        System.out.print(sd.getScalarObject(m) + " ");
+                    }
+                    cnt7++;
+                }
+                pierAttrData.add(map);
+                cnt7 = 0;
+
+//                System.out.println();
+            }
+
+            Variable pierData = dataFile.findVariable(group, "Pier_Data");
+            Array pierDataArr = pierData.read();
+            String[] pierValues = StringUtils.split(String.valueOf(pierDataArr), " ");
+
+            List<Map<String, String>> pierDataList = new ArrayList<>();
+
+//            System.out.println(pierAttrData);
+            for(int i=0; i < pierAttrData.size(); i++) {
+                Map<String, String> map = new HashMap<>();
+                int usIdx = Integer.parseInt(pierAttrData.get(i).get("usIdx")) * 2;
+                int usCnt = Integer.parseInt(pierAttrData.get(i).get("usCnt")) * 2;
+                int dsIdx = Integer.parseInt(pierAttrData.get(i).get("dsIdx")) * 2;
+                int dsCnt = Integer.parseInt(pierAttrData.get(i).get("dsCnt")) * 2;
+                String id = pierAttrData.get(i).get("id");
+                String usStation = pierAttrData.get(i).get("usStation");
+                String dsStation = pierAttrData.get(i).get("dsStation");
+                String usPierWidth = "";
+                String usElevation = "";
+                String dsPierWidth = "";
+                String dsElevation = "";
+                String usPierData = "";
+                String dsPierData = "";
+
+//                System.out.println("----" + id + " " + usStation + " " + dsStation);
+                // Upstream Pier Width/ Elevation 값
+                for (int k = 0; k < usCnt; k += 4) {
+//                    System.out.print(pierValues[usIdx] + " " + pierValues[usIdx + 1] + " " + pierValues[usIdx + 2] + " " + pierValues[usIdx + 3] + " ");
+                    usPierData = pierValues[usIdx] + " " + pierValues[usIdx + 1] + " " + pierValues[usIdx + 2] + " " + pierValues[usIdx + 3];
+                }
+
+                // Downstream Pier Width/ Elevation 값
+                for (int j = 0; j < dsCnt; j += 4) {
+//                    System.out.print(pierValues[dsIdx] + " " + pierValues[dsIdx + 1] + " " + pierValues[dsIdx + 2] + " " + pierValues[dsIdx + 3]);
+                    dsPierData = pierValues[dsIdx] + " " + pierValues[dsIdx + 1] + " " + pierValues[dsIdx + 2] + " " + pierValues[dsIdx + 3];
+                }
+
+                map.put("id", id);
+                map.put("usStation", usStation);
+                map.put("dsStation", dsStation);
+                map.put("usPierData", usPierData);
+                map.put("dsPierData", dsPierData);
+                pierDataList.add(map);
+            }
+
+            // Profile Data
+            Variable tableInfo = dataFile.findVariable(group, "Table_Info");
+            Array tableInfoArr = tableInfo.read();
+            List<String> tableInfoList = new ArrayList<>();
+
+            Variable profileData = dataFile.findVariable(group, "Profile_Data");
+            Array profileDataArr = profileData.read();
+            String[] profileValues = StringUtils.split(String.valueOf(profileDataArr), " ");
+
+            int cnt = 0;
+            for (int k = 0; k < tableInfoArr.getSize(); k++) {
+                ucar.ma2.StructureData sd = (ucar.ma2.StructureData) tableInfoArr.getObject(k);
+
+                for (ucar.ma2.StructureMembers.Member m : sd.getStructureMembers().getMembers()) {
+                    if(cnt < 2) {
+                        cnt++;
+//                        System.out.println(k + " " + sd.getScalarObject(m));
+                        tableInfoList.add(String.valueOf(sd.getScalarObject(m)));
+                    }
+                }
+                cnt = 0;
+            }
+
+            List<String> profileDataList = new ArrayList<>();
+            for(int i=0; i < tableInfoList.size(); i+=2) {
+                int tableStart = Integer.parseInt(tableInfoList.get(i)) * 2;
+                int tableCount = Integer.parseInt(tableInfoList.get(i + 1)) * 2;
+                StringBuilder geom = new StringBuilder("LINESTRING(");
+//                System.out.println(i/2 + "------------------");
+                for (int j = 0; j < tableCount; j++) {
+                    if(profileValues.length > tableStart + 1) {
+                        geom.append(profileValues[tableStart]);
+                        geom.append(" ");
+                        geom.append(profileValues[tableStart + 1]);
+
+                        if(j + 1 < tableCount) {
+                            geom.append(", ");
+                        }
+
+                        tableStart += 2;
+                    }
+                }
+                geom.append(")");
+                profileDataList.add(geom.toString());
+//                System.out.println(i/2 + " " + geom);
+            }
+
+            // User Defined Weir Connectivity
+            Variable udwc = dataFile.findVariable(group, "User_Defined_Weir_Connectivity");
+            Array udwcArr = udwc.read();
+
+            int cnt3 = 0;
+            List<Map<String, String>> udwcList = new ArrayList<>();
+            for (int k = 0; k < udwcArr.getSize(); k++) {
+                ucar.ma2.StructureData sd = (ucar.ma2.StructureData) udwcArr.getObject(k);
+                Map<String, String> udwcMap = new HashMap<>();
+                for (ucar.ma2.StructureMembers.Member m : sd.getStructureMembers().getMembers()) {
+//                    System.out.println(sd.getScalarObject(m));
+                    switch (cnt3) {
+                        case 0:
+                            udwcMap.put("id", String.valueOf(sd.getScalarObject(m)));
+                            break;
+                        case 1:
+                            udwcMap.put("hw_tw", String.valueOf(sd.getScalarObject(m)));
+                            break;
+                        case 2:
+                            udwcMap.put("rs_fp", String.valueOf(sd.getScalarObject(m)));
+                            break;
+                        case 3:
+                            udwcMap.put("station", String.valueOf(sd.getScalarObject(m)));
+                            break;
+                    }
+                    cnt3++;
+                }
+                udwcList.add(udwcMap);
+                cnt3 = 0;
+            }
+
+            Variable attr = dataFile.findVariable(group, "Attributes");
+            Array attrArr = attr.read();
+            int size = Integer.parseInt(String.valueOf(attrArr.getSize()));
+
+            resultMap.put("centerLine", centerLineGeomList);
+            resultMap.put("peirData", pierDataList);
+            resultMap.put("profileData", profileDataList);
+            resultMap.put("udwcData", udwcList);
+            resultMap.put("size", size);
+
         } catch (Exception e) {
             e.printStackTrace(System.err);
         } finally {
@@ -1170,5 +1352,6 @@ public class ReadHdf {
             }
         }
 
+        return resultMap;
     }
 }

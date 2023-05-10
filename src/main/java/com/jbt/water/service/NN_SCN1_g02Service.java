@@ -222,10 +222,32 @@ public class NN_SCN1_g02Service {
     public void insertStructures() {
         String fileName  = "C:\\Users\\srmsq\\Desktop\\waterdata\\NN_SCN1.g02.hdf";
         String groupName = "Geometry/Structures";
-        String centerLineInfoName = "Centerline_Info";
-        String centerLinePointsName = "Centerline_Points";
 
         ReadHdf readHdf = new ReadHdf();
-        readHdf.structuresReadHdf(fileName, groupName, centerLineInfoName, centerLinePointsName);
+        Map<String, Object> data = readHdf.structuresReadHdf(fileName, groupName);
+        Map<String,String> centerLineList = (Map<String,String>) data.get("centerLine");
+        List<Map<String,String>> peirDataList = (List<Map<String,String>>) data.get("peirData");
+        List<String> profileDataList = (List<String>) data.get("profileData");
+        List<Map<String,String>> udwcDataList = (List<Map<String,String>>) data.get("udwcData");
+        int size = Integer.parseInt(String.valueOf(data.get("size")));
+
+        Map<String, String> peirData = new HashMap<>();
+        for(Map<String, String> map : peirDataList) {
+            System.out.println(map);
+        }
+
+        for(int i=0; i < size; i++) {
+            Map<String, String> map = new HashMap<>();
+            map.put("structureId", String.valueOf(i));
+            if(centerLineList.get(String.valueOf(i)) != null) {
+                map.put("centerLine", centerLineList.get(String.valueOf(i)));
+            }
+
+
+//            map.put("centerlineGeom", )
+
+//            NNSCN1g02Mapper.insertStructures(map);
+        }
+
     }
 }
