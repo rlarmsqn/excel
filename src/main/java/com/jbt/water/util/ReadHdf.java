@@ -1217,6 +1217,7 @@ public class ReadHdf {
 
             List<Map<String, String>> pierDataList = new ArrayList<>();
 
+            int pierOptionId = 1;
 //            System.out.println(pierAttrData);
             for(int i=0; i < pierAttrData.size(); i++) {
                 Map<String, String> map = new HashMap<>();
@@ -1248,11 +1249,17 @@ public class ReadHdf {
                 }
 
                 map.put("id", id);
+                map.put("pierOptionId", String.valueOf(pierOptionId));
                 map.put("usStation", usStation);
                 map.put("dsStation", dsStation);
                 map.put("usPierData", usPierData);
                 map.put("dsPierData", dsPierData);
                 pierDataList.add(map);
+
+                pierOptionId++;
+                if(pierOptionId%7 == 0) {
+                    pierOptionId = 1;
+                }
             }
 
             // Profile Data

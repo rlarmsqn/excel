@@ -234,7 +234,7 @@ public class NN_SCN1_g02Service {
 
         // Pier Data
         for(int i=0; i < peirDataList.size(); i++) {
-//            NNSCN1g02Mapper.insertPierData(peirDataList.get(i));
+            NNSCN1g02Mapper.insertPierData(peirDataList.get(i));
         }
 
         // User Defined Weir Connectivity Data
@@ -250,7 +250,7 @@ public class NN_SCN1_g02Service {
 
 //            System.out.println(i + " / " + map);
 
-            NNSCN1g02Mapper.insertStructuresGeom(map);
+//            NNSCN1g02Mapper.insertStructuresGeom(map);
         }
 
     }

@@ -170,12 +170,14 @@
     <insert id="insertPierData" parameterType="Map">
         INSERT INTO STRUCTURES_PIER (
             ID,
+            PIER_OPTION_ID,
             US_STATION,
             DS_STATION,
             US_PIER_DATA,
             DS_PIER_DATA
         ) VALUES (
             #{id}::Integer,
+            #{pierOptionId}::Integer,
             #{usStation},
             #{dsStation},
             #{usPierData},
