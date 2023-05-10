@@ -1154,11 +1154,14 @@ public class ReadHdf {
                         }
                     }
                     sbGeom.append(")");
+//                    System.out.println(i + " / " + sbGeom);
 
                     if(!sbGeom.toString().equals("LINESTRING()")) {
 //                        System.out.println(i + " " + sbGeom);
                         centerLineGeomList.put(String.valueOf(i), sbGeom.toString());
 //                        centerLineGeomList.add(map);
+                    } else {
+                        centerLineGeomList.put(String.valueOf(i), null);
                     }
 
                 }
@@ -1275,7 +1278,7 @@ public class ReadHdf {
                 cnt = 0;
             }
 
-            List<String> profileDataList = new ArrayList<>();
+            Map<String, String> profileDataList = new HashMap<>();
             for(int i=0; i < tableInfoList.size(); i+=2) {
                 int tableStart = Integer.parseInt(tableInfoList.get(i)) * 2;
                 int tableCount = Integer.parseInt(tableInfoList.get(i + 1)) * 2;
@@ -1287,16 +1290,24 @@ public class ReadHdf {
                         geom.append(" ");
                         geom.append(profileValues[tableStart + 1]);
 
-                        if(j + 1 < tableCount) {
+//                        System.out.println((j + 1) + "  /  " +  tableCount);
+//                        if((j + 1) < tableCount) {
                             geom.append(", ");
-                        }
+//                        }
 
                         tableStart += 2;
                     }
                 }
+
+                geom.deleteCharAt(geom.length() - 2);
+
                 geom.append(")");
-                profileDataList.add(geom.toString());
-//                System.out.println(i/2 + " " + geom);
+//                System.out.println(geom);
+                if(!geom.toString().equals("LINESTRIN()")) {
+                    profileDataList.put(String.valueOf(i / 2), geom.toString());
+                } else {
+                    profileDataList.put(String.valueOf(i / 2), null);
+                }
             }
 
             // User Defined Weir Connectivity

@@ -5,10 +5,10 @@ import com.jbt.water.util.ReadHdf;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 @Service
 @RequiredArgsConstructor
@@ -227,26 +227,30 @@ public class NN_SCN1_g02Service {
         Map<String, Object> data = readHdf.structuresReadHdf(fileName, groupName);
         Map<String,String> centerLineList = (Map<String,String>) data.get("centerLine");
         List<Map<String,String>> peirDataList = (List<Map<String,String>>) data.get("peirData");
-        List<String> profileDataList = (List<String>) data.get("profileData");
+        Map<String, String> profileDataList = (Map<String,String>) data.get("profileData");
         List<Map<String,String>> udwcDataList = (List<Map<String,String>>) data.get("udwcData");
         int size = Integer.parseInt(String.valueOf(data.get("size")));
 
-        Map<String, String> peirData = new HashMap<>();
-        for(Map<String, String> map : peirDataList) {
-            System.out.println(map);
+
+        // Pier Data
+        for(int i=0; i < peirDataList.size(); i++) {
+//            NNSCN1g02Mapper.insertPierData(peirDataList.get(i));
+        }
+
+        // User Defined Weir Connectivity Data
+        for(int i=0; i < udwcDataList.size(); i++) {
+//            NNSCN1g02Mapper.insertUserDefinedWeirConnectivity(udwcDataList.get(i));
         }
 
         for(int i=0; i < size; i++) {
             Map<String, String> map = new HashMap<>();
-            map.put("structureId", String.valueOf(i));
-            if(centerLineList.get(String.valueOf(i)) != null) {
-                map.put("centerLine", centerLineList.get(String.valueOf(i)));
-            }
+            map.put("id", String.valueOf(i));
+            map.put("centerLineGeom", centerLineList.get(String.valueOf(i)));
+            map.put("profileGeom", profileDataList.get(String.valueOf(i)));
 
+//            System.out.println(i + " / " + map);
 
-//            map.put("centerlineGeom", )
-
-//            NNSCN1g02Mapper.insertStructures(map);
+            NNSCN1g02Mapper.insertStructuresGeom(map);
         }
 
     }

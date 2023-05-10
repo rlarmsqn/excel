@@ -154,5 +154,48 @@
             )
         </foreach>
     </insert>
+
+    <insert id="insertStructuresGeom" parameterType="Map">
+        INSERT INTO STRUCTURES (
+            ID,
+            CENTERLINE_GEOM,
+            PROFILE_GEOM
+        ) VALUES (
+            #{id}::Integer,
+            st_geomfromtext(#{centerLineGeom}, 3857),
+            st_geomfromtext(#{profileGeom}, 3857)
+        )
+    </insert>
+
+    <insert id="insertPierData" parameterType="Map">
+        INSERT INTO STRUCTURES_PIER (
+            ID,
+            US_STATION,
+            DS_STATION,
+            US_PIER_DATA,
+            DS_PIER_DATA
+        ) VALUES (
+            #{id}::Integer,
+            #{usStation},
+            #{dsStation},
+            #{usPierData},
+            #{dsPierData}
+        )
+    </insert>
+
+    <insert id="insertUserDefinedWeirConnectivity" parameterType="Map">
+        INSERT INTO STRUCTURES_USER_DEFINED_WEIR_CONNECTIVITY (
+            ID,
+            HW_TW,
+            RS_FP,
+            STATION
+        ) VALUES (
+            #{id}::Integer,
+            #{hw_tw},
+            #{rs_fp},
+            #{station}
+        )
+    </insert>
+
 </mapper>
 
