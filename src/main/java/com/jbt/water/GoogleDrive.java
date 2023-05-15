@@ -15,13 +15,17 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.drive.model.ChangeList;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
+import com.google.api.services.drive.model.StartPageToken;
 
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
+import java.sql.SQLOutput;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,10 +39,11 @@ public class GoogleDrive {
 
 
     public static void main(String[] args) throws IOException, GeneralSecurityException {
-//        GoogleDrive.upload();
+        GoogleDrive.upload();
 //        GoogleDrive.download();
-        GoogleDrive.update();
+//        GoogleDrive.update();
 //        GoogleDrive.delete();
+        GoogleDrive.driveChangeFileLog(GoogleDrive.fetchStartPageToken());
     }
     public static String upload() throws IOException, GeneralSecurityException {
 
@@ -53,10 +58,10 @@ public class GoogleDrive {
         // Upload file photo.jpg on drive.
         File fileMetadata = new File();
 //        fileMetadata.setName("NN_SCN1g02");
-        fileMetadata.setName("test");
+        fileMetadata.setName("abcdefg");
         // File's content.
 //        java.io.File filePath = new java.io.File("C:\\Users\\srmsq\\Desktop\\waterdata\\NN_SCN1.g02.hdf");
-        java.io.File filePath = new java.io.File("C:\\Users\\srmsq\\Desktop\\water\\test.txt");
+        java.io.File filePath = new java.io.File("C:\\Users\\srmsq\\Desktop\\water\\abce.txt");
         // Specify media type and file-path for file.
         FileContent mediaContent = new FileContent("*/*", filePath);
         try {
@@ -99,11 +104,12 @@ public class GoogleDrive {
                 .setApplicationName(APPLICATION_NAME)
                 .build();
 
-        Path path = Paths.get("C:\\Users\\srmsq\\Desktop\\water\\thistest.txt");
+        // 파일명은 업데이트 파일 명으로 바뀜
+        Path path = Paths.get("C:\\Users\\srmsq\\Desktop\\water\\checktest.txt");
         File fileMetadata = new File();
         fileMetadata.setName(path.getFileName().toString());
         AbstractInputStreamContent mediaContent = new FileContent(null, path.toFile());
-        service.files().update(getFileId("test"), fileMetadata, mediaContent).execute();
+        service.files().update(getFileId("djEJgrp?"), fileMetadata, mediaContent).execute();
     }
 
     public static void delete() throws IOException, GeneralSecurityException {
@@ -116,6 +122,83 @@ public class GoogleDrive {
                 .build();
 
         service.files().delete(getFileId("test")).execute();
+    }
+
+    public static String fetchStartPageToken() throws IOException, GeneralSecurityException {
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        System.out.println(getFileId("thisasds"));
+
+        Drive service = new Drive.Builder(new NetHttpTransport(),
+                GsonFactory.getDefaultInstance(),
+                GoogleDrive.getCredentials(HTTP_TRANSPORT))
+                .setApplicationName(APPLICATION_NAME)
+                .build();
+        try {
+            StartPageToken response = service.changes()
+                    .getStartPageToken().execute();
+            System.out.println("Start token: " + response.getStartPageToken());
+
+            return response.getStartPageToken();
+        } catch (GoogleJsonResponseException e) {
+            // TODO(developer) - handle error appropriately
+            System.err.println("Unable to fetch start page token: " + e.getDetails());
+            throw e;
+        }
+    }
+
+    // 파일 변경 사항 (업로드 or 변경 시)
+    public static String driveChangeFileLog(String startPageToken) throws GeneralSecurityException, IOException {
+        System.out.println("--- drive file change log ---");
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+
+        Drive service = new Drive.Builder(new NetHttpTransport(),
+                GsonFactory.getDefaultInstance(),
+                GoogleDrive.getCredentials(HTTP_TRANSPORT))
+                .setApplicationName(APPLICATION_NAME)
+                .build();
+        int cnt = 0;
+        try {
+            // Begin with our last saved start token for this user or the
+            // current token from getStartPageToken()
+            while (startPageToken != null) {
+                String token = "1";
+                ChangeList changes = service.changes().list(token)
+                        .execute();
+                for (com.google.api.services.drive.model.Change change : changes.getChanges()) {
+                    // Process change
+                    // removed 값이 false 인것 / 변경 시간이 당일 날짜인것만 출력 / 지금은 변경된 것만 판단, 신규업로드 시도 판단됨 근데 api로 등록하는것만 변경목록에 추가됨
+                    if(!change.getRemoved()) {
+                        if(LocalDate.now().toString().equals(change.getTime().toString().substring(0, 10))) {
+                        System.out.println(change.toPrettyString());
+//                        System.out.println("신규 업로드 / 변경 파일 시 다운로드할 FILE ID : " + change.getFileId());
+                            cnt++;
+                            System.out.println("cnt : " + cnt);
+                            System.out.println("------------");
+                        }
+                    }
+                }
+                /*if (changes.getNewStartPageToken() != null) {
+                    // Last page, save this token for the next polling interval
+                    savedStartPageToken = changes.getNewStartPageToken();
+                    System.out.println(changes.getNextPageToken());
+                    ChangeList nextChanges = service.changes().list(savedStartPageToken)
+                            .execute();
+                    for (com.google.api.services.drive.model.Change change : changes.getChanges()) {
+                        // Process change
+                        System.out.println("Change found for file: " + change.getFileId());
+                    }
+                } else {
+                    break;
+                }*/
+                startPageToken = changes.getNextPageToken();
+            }
+
+            return startPageToken;
+        } catch (GoogleJsonResponseException e) {
+            // TODO(developer) - handle error appropriately
+            System.err.println("Unable to fetch changes: " + e.getDetails());
+            throw e;
+        }
     }
 
     public static String getFileId(String getId) throws GeneralSecurityException, IOException {
