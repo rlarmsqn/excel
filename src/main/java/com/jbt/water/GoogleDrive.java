@@ -7,6 +7,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+import com.google.api.client.http.AbstractInputStreamContent;
 import com.google.api.client.http.FileContent;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -18,6 +19,8 @@ import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
@@ -33,7 +36,9 @@ public class GoogleDrive {
 
     public static void main(String[] args) throws IOException, GeneralSecurityException {
 //        GoogleDrive.upload();
-        GoogleDrive.download();
+//        GoogleDrive.download();
+        GoogleDrive.update();
+//        GoogleDrive.delete();
     }
     public static String upload() throws IOException, GeneralSecurityException {
 
@@ -47,9 +52,11 @@ public class GoogleDrive {
                 .build();
         // Upload file photo.jpg on drive.
         File fileMetadata = new File();
-        fileMetadata.setName("NN_SCN1g02");
+//        fileMetadata.setName("NN_SCN1g02");
+        fileMetadata.setName("test");
         // File's content.
-        java.io.File filePath = new java.io.File("C:\\Users\\srmsq\\Desktop\\waterdata\\NN_SCN1.g02.hdf");
+//        java.io.File filePath = new java.io.File("C:\\Users\\srmsq\\Desktop\\waterdata\\NN_SCN1.g02.hdf");
+        java.io.File filePath = new java.io.File("C:\\Users\\srmsq\\Desktop\\water\\test.txt");
         // Specify media type and file-path for file.
         FileContent mediaContent = new FileContent("*/*", filePath);
         try {
@@ -74,12 +81,41 @@ public class GoogleDrive {
                 .setApplicationName(APPLICATION_NAME)
                 .build();
 
-        OutputStream outputStream = new ByteArrayOutputStream();
-        service.files().export(getFileId("test"), 'application/pdf').executeMediaAndDownloadTo(outputStream);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        service.files().get(getFileId("NN_SCN1g02")).executeMediaAndDownloadTo(outputStream);
+
+        FileOutputStream fos = new FileOutputStream("hdf.hdf");
+        outputStream.writeTo(fos);
         System.out.println(outputStream);
 
+    }
 
+    public static void update() throws IOException, GeneralSecurityException{
+        NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 
+        Drive service = new Drive.Builder(new NetHttpTransport(),
+                GsonFactory.getDefaultInstance(),
+                GoogleDrive.getCredentials(HTTP_TRANSPORT))
+                .setApplicationName(APPLICATION_NAME)
+                .build();
+
+        Path path = Paths.get("C:\\Users\\srmsq\\Desktop\\water\\thistest.txt");
+        File fileMetadata = new File();
+        fileMetadata.setName(path.getFileName().toString());
+        AbstractInputStreamContent mediaContent = new FileContent(null, path.toFile());
+        service.files().update(getFileId("test"), fileMetadata, mediaContent).execute();
+    }
+
+    public static void delete() throws IOException, GeneralSecurityException {
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+
+        Drive service = new Drive.Builder(new NetHttpTransport(),
+                GsonFactory.getDefaultInstance(),
+                GoogleDrive.getCredentials(HTTP_TRANSPORT))
+                .setApplicationName(APPLICATION_NAME)
+                .build();
+
+        service.files().delete(getFileId("test")).execute();
     }
 
     public static String getFileId(String getId) throws GeneralSecurityException, IOException {
