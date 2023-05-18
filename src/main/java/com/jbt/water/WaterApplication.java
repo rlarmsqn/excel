@@ -34,6 +34,6 @@ public class WaterApplication {
 //        NNSCN1g02Service.insertRiverCenterLines();
 //        NNSCN1g02Service.insertRiverEdgeLines();
 //        NNSCN1g02Service.insertStorageAreas();
-        NNSCN1g02Service.insertStructures();
+//        NNSCN1g02Service.insertStructures();
     }
 }

@@ -1,4 +1,3 @@
-
 spring:
   main:
     banner-mode: 'off'
@@ -13,4 +12,5 @@ mybatis:
   configuration:
     call-setters-on-nulls: true
     map-underscore-to-camel-case: true
+
 
