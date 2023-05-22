@@ -18,11 +18,14 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.*;
 import com.google.api.services.drive.model.File;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -33,6 +36,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+@Component
+@Slf4j
 public class GoogleDrive {
     private static final String APPLICATION_NAME = "GoogleDriveApiTestName";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
@@ -42,14 +47,14 @@ public class GoogleDrive {
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
 
-    public static void main(String[] args) throws IOException, GeneralSecurityException {
+  /*  public static void main(String[] args) throws IOException, GeneralSecurityException {
 //        GoogleDrive.upload();
 //        GoogleDrive.download();
 //        GoogleDrive.update();
 //        GoogleDrive.delete();
 //        GoogleDrive.driveChangeFileLog(GoogleDrive.fetchStartPageToken());
         GoogleDrive.push();
-    }
+    }*/
     public static String upload() throws IOException, GeneralSecurityException {
 
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
@@ -213,6 +218,7 @@ public class GoogleDrive {
 
     // 푸시 알림
     public static void push() throws IOException, GeneralSecurityException {
+        log.info("push-----------");
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 
         Drive service = new Drive.Builder(new NetHttpTransport(),
