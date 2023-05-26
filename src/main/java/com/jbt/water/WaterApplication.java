@@ -16,10 +16,10 @@ import java.security.GeneralSecurityException;
 public class WaterApplication {
 
     public static void main(String[] args) throws IOException, GeneralSecurityException {
-        log.info("safdsafdsafdsadfasfdsdaf");
         ApplicationContext context = SpringApplication.run(WaterApplication.class, args);
         WaterService service = context.getBean(WaterService.class);
         NN_SCN1_g02Service NNSCN1g02Service = context.getBean(NN_SCN1_g02Service.class);
+
         /*log.info("insert start");
         if(service.insertData().length() == 0) {
             log.info("insert end..");

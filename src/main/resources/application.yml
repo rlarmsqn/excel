@@ -18,6 +18,20 @@ mybatis:
   configuration:
     call-setters-on-nulls: true
     map-underscore-to-camel-case: true
+
 server:
   port: 443
+  ssl:
+    key-store: classpath:ssl/keystore.p12
+    key-store-type: PKCS12
+    key-store-password: 'asdf664417'
+
+
+#    enabled: true
+#    key-alias: ayokeystore
+#    key-store: ayokeystore.pkcs12
+#    key-store-password: 'asdf664417'
+#    key-password: 'asdf664417'
+#    trust-store: ayotrust.pkcs12
+#    trust-store-password: 'asdf664417'
 

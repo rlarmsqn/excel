@@ -1,7 +1,7 @@
 package com.jbt.water.service;
 
 import com.jbt.water.mapper.NN_SCN1_g02Mapper;
-import com.jbt.water.util.ReadHdf;
+import com.jbt.water.vo.util.ReadHdf;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

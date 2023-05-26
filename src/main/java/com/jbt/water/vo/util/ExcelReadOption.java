@@ -1,4 +1,4 @@
-package com.jbt.water.util;
+package com.jbt.water.vo.util;
 
 import java.util.ArrayList;
 import java.util.List;

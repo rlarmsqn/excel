@@ -1,4 +1,4 @@
-package com.jbt.water.util;
+package com.jbt.water.vo.util;
 
 import jdk.swing.interop.SwingInterOpUtils;
 import org.apache.commons.lang3.StringUtils;

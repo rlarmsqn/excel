@@ -1,6 +1,6 @@
 package com.jbt.water;
 
-import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.auth.oauth2.*;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
@@ -18,22 +18,21 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.*;
 import com.google.api.services.drive.model.File;
+
+import com.sun.net.httpserver.HttpServer;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.springframework.context.annotation.Bean;
+
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
 import java.util.UUID;
 
 @Component
@@ -43,18 +42,18 @@ public class GoogleDrive {
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
     private static final List<String> SCOPES =
-            Collections.singletonList(DriveScopes.DRIVE_FILE);
+            Collections.singletonList(DriveScopes.DRIVE);
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
 
-  /*  public static void main(String[] args) throws IOException, GeneralSecurityException {
+    public static void main(String[] args) throws IOException, GeneralSecurityException {
 //        GoogleDrive.upload();
 //        GoogleDrive.download();
 //        GoogleDrive.update();
 //        GoogleDrive.delete();
 //        GoogleDrive.driveChangeFileLog(GoogleDrive.fetchStartPageToken());
-        GoogleDrive.push();
-    }*/
+//        GoogleDrive.push();
+    }
     public static String upload() throws IOException, GeneralSecurityException {
 
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
@@ -68,10 +67,10 @@ public class GoogleDrive {
         // Upload file photo.jpg on drive.
         File fileMetadata = new File();
 //        fileMetadata.setName("NN_SCN1g02");
-        fileMetadata.setName("텟스트");
+        fileMetadata.setName("ttttt");
         // File's content.
 //        java.io.File filePath = new java.io.File("C:\\Users\\srmsq\\Desktop\\waterdata\\NN_SCN1.g02.hdf");
-        java.io.File filePath = new java.io.File("C:\\Users\\srmsq\\Desktop\\water\\테스트.txt");
+        java.io.File filePath = new java.io.File("C:\\Users\\srmsq\\Desktop\\water\\aaaaaaa.txt");
         // Specify media type and file-path for file.
         FileContent mediaContent = new FileContent("*/*", filePath);
         try {
@@ -141,7 +140,6 @@ public class GoogleDrive {
 
     public static String fetchStartPageToken() throws IOException, GeneralSecurityException {
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        System.out.println(getFileId("thisasds"));
 
         Drive service = new Drive.Builder(new NetHttpTransport(),
                 GsonFactory.getDefaultInstance(),
@@ -151,7 +149,7 @@ public class GoogleDrive {
         try {
             StartPageToken response = service.changes()
                     .getStartPageToken().execute();
-            System.out.println("Start token: " + response.getStartPageToken());
+//            System.out.println("Start token: " + response.getStartPageToken());
 
             return response.getStartPageToken();
         } catch (GoogleJsonResponseException e) {
@@ -163,6 +161,8 @@ public class GoogleDrive {
 
     // 파일 변경 사항 (업로드 or 변경 시)
     public static String driveChangeFileLog(String startPageToken) throws GeneralSecurityException, IOException {
+        log.info("드라이브체인지로그");
+        String pageToken = null;
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 
         Drive service = new Drive.Builder(new NetHttpTransport(),
@@ -170,43 +170,60 @@ public class GoogleDrive {
                 GoogleDrive.getCredentials(HTTP_TRANSPORT))
                 .setApplicationName(APPLICATION_NAME)
                 .build();
-        System.out.println(GoogleDrive.getCredentials(HTTP_TRANSPORT).getAccessToken());
-        int cnt = 0;
         try {
-            // Begin with our last saved start token for this user or the
-            // current token from getStartPageToken()
-            while (startPageToken != null) {
-                String token = "1";
+            /*com.google.api.services.drive.model.ChangeList changes = service
+                    .changes()
+                    .list("1")
+                    .execute();
 
-                ChangeList changes = service.changes().list(token)
+            for (com.google.api.services.drive.model.Change change : changes.getChanges()) {
+                if (change.getRemoved() != null && change.getRemoved()) {
+                    // 변경 사항이 삭제된 경우, 스킵합니다.
+                    continue;
+                }
+
+                if (change.getFile() != null) {
+                    // 변경 사항에 포함된 파일 정보 가져오기
+                    String fileId = change.getFileId();
+                    File file = change.getFile();
+                    String fileName = file.getName();
+
+                    if (file.getMimeType().equals("application/vnd.google-apps.folder")) {
+                        // 변경 사항이 폴더인 경우 스킵합니다.
+                        continue;
+                    }
+
+                    // 드래그 앤 드롭으로 추가된 파일 출력
+//                    log.info("File ID: " + fileId + ", File Name: " + fileName);
+
+                    // 파일 상세 정보 가져오기 (옵션)
+                    File fullFile = service.files().get(fileId).execute();
+                    log.info(change.getFile().toPrettyString());
+                    // fullFile 변수를 사용하여 파일의 상세 정보에 접근할 수 있습니다.
+                }
+            }*/
+//            while (startPageToken != null) {
+//                String token = "1";
+
+                ChangeList changes = service.changes().list( String.valueOf(Integer.parseInt(startPageToken) - 1))
+//                        .setIncludeItemsFromAllDrives(true) // 모든 드라이버 항목 포함 설정
                         .execute();
                 for (com.google.api.services.drive.model.Change change : changes.getChanges()) {
                     // Process change
-                    // removed 값이 false 인것 / 변경 시간이 당일 날짜인것만 출력 / 변경, 신규업로드(둘다 당일 변경목록에 추가되면 구분x) 근데 api로 등록하는것만 변경목록에 추가됨
+                    // removed 값이 false 인것 / 변경 시간이 당일 날짜인것만 출력 / 변경, 신규업로드(둘다 당일 변경목록에 추가됨 구분x) 근데 api로 등록하는것만 변경목록에 추가됨
                     if(!change.getRemoved()) {
                         if(LocalDate.now().toString().equals(change.getTime().toString().substring(0, 10))) {
 //                        System.out.println("신규 업로드 / 변경 파일 시 다운로드할 FILE ID : " + change.getFileId());
                             download(change.getFileId(), change.getFile().getName());
-                            System.out.println(change.toPrettyString());
-                            System.out.println("------------");
+                            log.info(change.toPrettyString());
+//                            log.info("------------");
                         }
                     }
                 }
-                /*if (changes.getNewStartPageToken() != null) {
-                    // Last page, save this token for the next polling interval
-                    savedStartPageToken = changes.getNewStartPageToken();
-                    System.out.println(changes.getNextPageToken());
-                    ChangeList nextChanges = service.changes().list(savedStartPageToken)
-                            .execute();
-                    for (com.google.api.services.drive.model.Change change : changes.getChanges()) {
-                        // Process change
-                        System.out.println("Change found for file: " + change.getFileId());
-                    }
-                } else {
-                    break;
-                }*/
+
                 startPageToken = changes.getNextPageToken();
-            }
+//                log.info("startPageToken : " + startPageToken);
+//            }
 
             return startPageToken;
         } catch (GoogleJsonResponseException e) {
@@ -231,8 +248,10 @@ public class GoogleDrive {
         channel.setId(UUID.randomUUID().toString());
         channel.setType("web_hook");
         channel.setAddress("https://boooddha.com/notifications");
+        // pageToken root면 드라이브내 전체 파일을 뜻함
+        Channel creatChannel = service.changes().watch("1", channel).execute();
 
-        service.changes().watch("root", channel).execute();
+        log.info("구독 ID : " + creatChannel.getId());
 
         /*HttpClient client = HttpClientBuilder.create().build();
         HttpPost postRequest = new HttpPost("https://www.googleapis.com/drive/v3/changes/watch");
@@ -280,7 +299,7 @@ public class GoogleDrive {
         return id;
     }
 
-    private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
+    public static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
             throws IOException {
         // Load client secrets.
         InputStream in = DriveQuickstart.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
@@ -296,9 +315,48 @@ public class GoogleDrive {
                 .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
                 .setAccessType("offline")
                 .build();
-        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
-        Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
-        //returns an authorized Credential object.
+
+//        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
+
+//        // 이 도메인으로 인증창을 띄위려하면 Address already in use 에러 뜸..
+        LocalServerReceiver receiverBuilder = new LocalServerReceiver.Builder()
+//                .setHost(InetAddress.getLocalHost().getHostAddress());
+                .setHost("www.boooddha.com")
+                .setPort(443)
+                .build();
+
+
+        Credential credential = new AuthorizationCodeInstalledApp(flow, receiverBuilder).authorize("user");
+
+
+       /* AuthorizationCodeFlow flow = new AuthorizationCodeFlow.Builder(
+                BearerToken.authorizationHeaderAccessMethod(),
+                HTTP_TRANSPORT,
+                JSON_FACTORY,
+                new com.google.api.client.http.GenericUrl("https://accounts.google.com/o/oauth2/token"),
+                new com.google.api.client.auth.oauth2.ClientParametersAuthentication("440723426577-m14q8nibtbj0n4n10n5ittud2feugprh.apps.googleusercontent.com", "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"),
+                "440723426577-m14q8nibtbj0n4n10n5ittud2feugprh.apps.googleusercontent.com",
+                "https://accounts.google.com/o/oauth2/auth")
+                .setScopes(SCOPES)
+                .build();
+
+
+        AuthorizationCodeRequestUrl authorizationUrl = flow.newAuthorizationUrl();
+        String url = authorizationUrl.setRedirectUri("https://www.boooddha.com").build();
+
+        AuthorizationCodeInstalledApp.browse(url);
+        System.out.print("Enter the authorization code: ");
+        Scanner scanner = new Scanner(System.in);
+        String authorizationCode = scanner.nextLine();
+*/
+        // 액세스 토큰을 요청합니다.
+//        TokenResponse tokenResponse = flow.newTokenRequest(authorizationCode)
+//                .setRedirectUri("https://www.boooddha.com")
+//                .execute();
+
+        // Credential을 생성합니다.
+//        Credential credential = flow.createAndStoreCredential(tokenResponse, null);
+
         return credential;
     }
 }
